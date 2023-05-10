@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-volume-claim
+  labels:
+    {{- include "volumes.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  storageClassName: k8slvm
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi

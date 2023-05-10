@@ -71,7 +71,7 @@ ports:
 # Optional
 retries:
   attempts: 3
-  perTryTimeout: 2s
+  perTryTimeout: 5s
 
 # The overall timeout for requests to this service
 # Optional
