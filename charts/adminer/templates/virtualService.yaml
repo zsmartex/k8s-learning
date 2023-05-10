@@ -8,7 +8,7 @@ metadata:
 spec:
   gateways:
     - {{ .Values.global.ingressGatewayName | quote }}
-    - adminer-gateway
+    - "adminer-gateway"
   hosts:
     - "adminer.{{ .Values.global.externalHostname }}"
   http:

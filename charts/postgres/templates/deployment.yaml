@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "adminer.fullname" . }}
+  name: {{ include "postgres.fullname" . }}
   labels:
-    {{- include "adminer.labels" . | nindent 4 }}
+    {{- include "postgres.labels" . | nindent 4 }}
   namespace: {{ .Release.Namespace | quote }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
@@ -11,8 +11,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "adminer.selectorLabels" . | nindent 6 }}
-      version: {{ .Values.version | quote }}
+      {{- include "postgres.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,14 +19,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "adminer.selectorLabels" . | nindent 8 }}
-        version: {{ .Values.version | quote }}
+        {{- include "postgres.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "adminer.serviceAccountName" . }}
+      serviceAccountName: {{ include "postgres.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -44,8 +42,16 @@ spec:
             {{- end }}
             {{- end }}
           env:
-            - name: ADMINER_DESIGN
-              value: pepa-linha-dark
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgres.name" . }}-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgres.name" . }}-secret
+                  key: password
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

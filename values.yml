@@ -3,6 +3,13 @@ adminer:
     repository: adminer
     tag: 4
 
+postgres:
+  image:
+    repository: postgres
+    tag: 15
+  username: root
+  password: changeme
+
 global:
   externalHostname: k8s-learn.com
   deploymentId: zsmartex
