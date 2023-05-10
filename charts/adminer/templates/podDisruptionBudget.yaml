@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "adminer.name" . }}
+  labels:
+    {{- include "adminer.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  maxUnavailable: {{ .Values.maxUnavailable }}
+  selector:
+    matchLabels:
+      app: {{ .Values.service.name | lower | quote }}
+      version: {{ .Values.version | quote }}

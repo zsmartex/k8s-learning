@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adminer.name" . }}
+  labels:
+    {{- include "adminer.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  ports:
+{{- range $key, $value := .Values.service.ports }}
+    - name: {{ $key | quote }}
+{{ toYaml $value | indent 6 }}
+{{- end }}
+  selector:
+    {{- include "adminer.selectorLabels" . | nindent 4 }}

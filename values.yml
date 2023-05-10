@@ -1,0 +1,13 @@
+adminer:
+  image:
+    repository: adminer
+    tag: 4
+
+global:
+  externalHostname: k8s-learn.com
+  deploymentId: zsmartex
+  ingressGatewayName: istio-ingress/istio-ingress
+
+  svcNames:
+    adminer: adminer
+    postgres: postgres
