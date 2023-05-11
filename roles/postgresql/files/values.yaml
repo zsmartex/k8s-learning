@@ -1,0 +1,16 @@
+auth:
+  username: root
+  password: changeme
+
+primary:
+  persistence:
+    storageClass: k8slvm
+    size: 10Gi
+
+readReplicas:
+  persistence:
+    storageClass: k8slvm
+    size: 10Gi
+
+volumePermissions:
+  enabled: true

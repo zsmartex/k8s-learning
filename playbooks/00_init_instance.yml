@@ -1,0 +1,48 @@
+- name: Stage 0 - Init local configuration files for hashistack instanciation
+  hosts: localhost
+  become: false
+  gather_facts: false
+  vars:
+    base_dir: "{{ lookup('env', 'PWD') }}/inventories"
+    dir_name: "{{ workspace }}"
+  tasks:
+    - name: Create directory for inventory
+      file:
+        path: "{{ _current_dir }}"
+        state: directory
+        recurse: true
+      loop:
+        - "{{ base_dir }}/{{ dir_name }}/group_vars/{{ workspace  }}"
+        - "{{ base_dir }}/{{ dir_name }}/group_vars/{{ workspace  }}/secrets"
+        - "{{ base_dir }}/{{ dir_name }}/host_vars"
+      loop_control:
+        loop_var: _current_dir
+
+    - name: Create inventory files
+      copy:
+        dest: "{{ base_dir }}/{{ dir_name }}/inventory"
+        mode: 0640
+        content: |-
+          #
+          # Inventory for Hashistack instance: {{ workspace }}
+          #
+          # Playbooks rely on predefined groups hierarchy:
+          #
+          localhost ansible_connection=local
+          #
+
+    - name: Create ssh.cfg
+      copy:
+        dest: "{{ base_dir }}/{{ dir_name }}/ssh.cfg"
+        mode: 0640
+        content: |-
+          #
+          # SSH configuration for Hashistack instance: {{ workspace }}
+          #
+
+    - name: Create instance-local ansible configuration
+      copy:
+        dest: "{{ base_dir }}/{{ dir_name }}/Makefile"
+        mode: 0640
+        content: |-
+          include ../../Makefile

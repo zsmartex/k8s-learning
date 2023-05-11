@@ -1,0 +1,6 @@
+- name: Remove postgresql release and waiting suppression ending
+  kubernetes.core.helm:
+    name: postgresql
+    state: absent
+    wait: true
+    release_namespace: "{{ kubernetes_namespace }}"

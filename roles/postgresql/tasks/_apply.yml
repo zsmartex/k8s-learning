@@ -1,0 +1,13 @@
+- name: Add postgresql repository
+  kubernetes.core.helm_repository:
+    name: bitnami
+    url: oci://registry-1.docker.io/bitnamicharts
+
+- name: Deploy latest version of postgresql Chart
+  kubernetes.core.helm:
+    name: postgres
+    chart_ref: bitnami/postgresql
+    version: 12.5.0
+    release_namespace: "{{ kubernetes_namespace }}"
+    values_files:
+      - values.yaml

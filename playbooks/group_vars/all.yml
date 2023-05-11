@@ -1,0 +1,15 @@
+workspace: zmartex-stack
+collection_root: "{{ (playbook_dir) | realpath }}"
+
+# apply for install destroy for uninstall
+action: apply
+# Use for delete volume of kubernetes
+purge: false
+
+workspace_name: "ZSmartex Stack"
+kubernetes_namespace: "{{ workspace }}"
+workspace_host_vars_dir: "{{ workspace_root }}/host_vars"
+workspace_group_vars_dir: "{{ workspace_root }}/group_vars/{{ workspace }}"
+workspace_group_vars_dir_relative_dir: "./group_vars/{{ workspace }}"
+workspace_secrets_dir: "{{ workspace_group_vars_dir }}/secrets"
+workspace_secrets_dir_relative_dir: "{{ workspace_group_vars_dir_relative_dir }}/secrets"
