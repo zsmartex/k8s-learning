@@ -1,0 +1,22 @@
+apiVersion: v2
+appVersion: "1.16.0"
+version: 0.1.0
+name: z-dax
+description: Helm as stack for zsmartex cryptocurrency exchange
+
+dependencies:
+  - name: adminer
+    repository: https://cetic.github.io/helm-charts
+    version: 0.2.1
+  - name: postgresql
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 12.5.1
+  - name: elasticsearch
+    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 19.8.1
+  - name: redpanda
+    repository: https://charts.redpanda.com
+    version: 4.0.16
+  - name: questdb
+    repository: https://helm.questdb.io
+    version: 0.30.0

@@ -1,0 +1,36 @@
+---
+- name: Create a ingress-nginx namespace
+  kubernetes.core.k8s:
+    name: ingress-nginx
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Patch ingress-nginx namespace with istio-injection
+  kubernetes.core.k8s:
+    state: patched
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: ingress-nginx
+        labels:
+          "istio-injection": enabled
+
+- name: Add bitnami chart repo
+  kubernetes.core.helm_repository:
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+
+- name: Deploy latest version of ingress-nginx chart
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: bitnami/nginx-ingress-controller
+    chart_version: 9.6.1
+    release_namespace: ingress-nginx
+    values:
+      controller:
+        annotations:
+          traffic.sidecar.istio.io/includeInboundPorts: ""
+          traffic.sidecar.istio.io/excludeInboundPorts: "80,443"
+          sidecar.istio.io/inject: "true"

@@ -1,0 +1,38 @@
+---
+- name: Create a kiali-operator namespace
+  kubernetes.core.k8s:
+    name: kiali-operator
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Add kiali chart repo
+  kubernetes.core.helm_repository:
+    name: kiali
+    repo_url: https://kiali.org/helm-charts
+
+- name: Deploy latest version of kiali-operator chart
+  kubernetes.core.helm:
+    name: kiali-operator
+    chart_ref: kiali/kiali-operator
+    chart_version: 1.68.0
+    release_namespace: kiali-operator
+    values:
+      cr:
+        create: true
+        name: kiali
+        namespace: istio-system
+        spec:
+          auth:
+            strategy: anonymous
+          login_token:
+            signing_key: PASSWORD
+          deployment:
+            ingress:
+              enabled: true
+              class_name: nginx
+          server:
+            web_fqdn: kiali.k8s-learn.com
+            web_schema: http
+            web_port: 80
+            web_root: /

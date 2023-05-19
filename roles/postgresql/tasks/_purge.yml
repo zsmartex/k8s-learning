@@ -1,7 +1,0 @@
-- name: Remove postgresql pvc
-  kubernetes.core.k8s:
-    state: absent
-    api_version: v1
-    kind: PersistentVolumeClaim
-    namespace: "{{ kubernetes_namespace }}"
-    name: data-postgresql-0

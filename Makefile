@@ -47,3 +47,15 @@ prepare: venv-check ### Install workspace env dependencies
 ##
 init_instance: ## Init inventory dir for instance
 	ansible-playbook playbooks/00_init_instance.yml
+
+10_istio: ## Install istio for kubernetes
+	ansible-playbook playbooks/10_istio_install.yml
+
+11_ingress-nginx: ## Install ingress nginx for kubernetes
+	ansible-playbook playbooks/11_ingress-nginx_install.yml
+
+12_kiali: ## Install kiali for kubernetes
+	ansible-playbook playbooks/12_kiali.yml
+
+20_z-dax: ## Install z-dax
+	ansible-playbook playbooks/20_z-dax_install.yml

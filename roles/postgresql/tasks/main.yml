@@ -1,6 +1,0 @@
-- name: Helm
-  include_tasks: _{{ action }}.yml
-
-- name: Purge
-  include_tasks: _purge.yml
-  when: purge == yes and action == 'destroy'

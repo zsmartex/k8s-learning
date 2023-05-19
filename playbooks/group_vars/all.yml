@@ -1,4 +1,4 @@
-workspace: zmartex-stack
+workspace: zsmartex-stack
 collection_root: "{{ (playbook_dir) | realpath }}"
 
 # apply for install destroy for uninstall

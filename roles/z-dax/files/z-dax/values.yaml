@@ -1,0 +1,97 @@
+# Default values for z-dax.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Adminer database management
+adminer:
+  config:
+    design: pepa-linha-dark
+    externalserver: postgresql
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: true
+    className: istio
+    hosts:
+      - adminer.k8s-learn.com
+
+# Postgresql database
+postgresql:
+  auth:
+    username: root
+    password: changeme
+  primary:
+    persistence:
+      storageClass: k8slvm
+      size: 10Gi
+  volumePermissions:
+    enabled: true
+
+# Elasticsearch search engine
+elasticsearch:
+  master:
+    replicaCount: 3
+    persistence:
+      storageClass: k8slvm
+      size: 10Gi
+    autoscaling:
+      enabled: false
+      minReplicas: 3
+      maxReplicas: 10
+  data:
+    replicaCount: 3
+    persistence:
+      storageClass: k8slvm
+      size: 10Gi
+    autoscaling:
+      enabled: false
+      minReplicas: 3
+      maxReplicas: 10
+  ingress:
+    enabled: true
+    tls: false
+    ingressClassName: istio
+    extraHosts:
+      - name: elasticsearch-svc
+        path: /
+      - name: elasticsearch.k8s-learn.com
+        path: /
+    secrets: []
+  security:
+    tls:
+      restEncryption: false
+
+# Redpanda kafka like
+redpanda:
+  tls:
+    enabled: false
+  statefulset:
+    replicas: 3
+  storage:
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+      storageClass: k8slvmxfs
+  # Redpanda console kowl
+  console:
+    ingress:
+      enabled: true
+      className: istio
+      hosts:
+        - host: console.k8s-learn.com
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+
+# Questdb timeseries database
+questdb:
+  persistence:
+    enabled: true
+    size: 10Gi
+  ingress:
+    enabled: true
+    ingressClassName: istio
+    hosts:
+      - host: questdb.k8s-learn.com
+        paths:
+          - /

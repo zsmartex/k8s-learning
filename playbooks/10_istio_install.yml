@@ -1,0 +1,7 @@
+---
+- name: Stage 1 - Init local configuration files for hashistack instanciation
+  hosts: localhost
+  become: false
+  gather_facts: false
+  roles:
+    - istio
