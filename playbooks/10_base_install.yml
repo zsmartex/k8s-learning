@@ -1,0 +1,7 @@
+---
+- name: Stage 1 - Install Istio + Nginx + Kiali + Monitoring
+  hosts: localhost
+  become: false
+  gather_facts: false
+  roles:
+    - base

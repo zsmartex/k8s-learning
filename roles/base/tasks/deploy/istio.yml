@@ -6,6 +6,11 @@
     kind: Namespace
     state: present
 
+- name: Add istio chart repo
+  kubernetes.core.helm_repository:
+    name: istio
+    repo_url: https://istio-release.storage.googleapis.com/charts
+
 - name: Patch istio-system namespace with istio-injection
   kubernetes.core.k8s:
     state: patched
@@ -16,11 +21,6 @@
         name: istio-system
         labels:
           "istio-injection": enabled
-
-- name: Add istio chart repo
-  kubernetes.core.helm_repository:
-    name: istio
-    repo_url: https://istio-release.storage.googleapis.com/charts
 
 - name: Deploy latest version of istio/base chart
   kubernetes.core.helm:
@@ -35,10 +35,32 @@
     chart_ref: istio/istiod
     chart_version: 1.17.2
     release_namespace: istio-system
+    values:
+      global:
+        tag: 1.15.0
+        tracer:
+          zipkin:
+            address: jaeger-collector.istio-system.svc.cluster.local:9411
+      meshConfig:
+        enablePrometheusMerge: true
+        enableTracing: true
+        defaultConfig:
+          tracing:
+            sampling: 100
 
 - name: Deploy latest version of istio/gateway chart
   kubernetes.core.helm:
-    name: istio-ingress
+    name: istio-ingressgateway
     chart_ref: istio/gateway
     chart_version: 1.17.2
-    release_namespace: istio-ingressgateway
+    release_namespace: istio-system
+
+- name: Deploy latest version of istio/gateway chart
+  kubernetes.core.helm:
+    name: istio-egressgateway
+    chart_ref: istio/gateway
+    chart_version: 1.17.2
+    release_namespace: istio-system
+    values:
+      service:
+        type: ClusterIP

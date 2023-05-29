@@ -23,11 +23,31 @@
         name: kiali
         namespace: istio-system
         spec:
+          external_services:
+            grafana:
+              in_cluster_url: http://kube-prometheus-stack-grafana.monitoring
+              dashboards:
+                - name: "Istio Service Dashboard"
+                - name: "Istio Workload Dashboard"
+                - name: "Istio Mesh Dashboard"
+                - name: "Istio Control Plane Dashboard"
+                - name: "Istio Performance Dashboard"
+                - name: "Istio Wasm Extension Dashboard"
+            prometheus:
+              url: http://kube-prometheus-stack-prometheus.monitoring:9090
+              health_check_url: http://kube-prometheus-stack-prometheus.monitoring:9090/-/healthy
+            tracing:
+              enabled: true
+              in_cluster_url: http://jaeger-collector.monitoring:16685/jaeger
+              use_grpc: true
           auth:
             strategy: anonymous
           login_token:
             signing_key: PASSWORD
           deployment:
+            istio_namespace: istio-system
+            accessible_namespaces:
+              - "**"
             ingress:
               enabled: true
               class_name: nginx

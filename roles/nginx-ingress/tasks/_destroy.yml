@@ -1,7 +1,0 @@
----
-- name: Remove istio-ingress release and waiting suppression ending
-  kubernetes.core.helm:
-    name: ingress-nginx
-    state: absent
-    release_namespace: ingress-nginx
-    wait: true

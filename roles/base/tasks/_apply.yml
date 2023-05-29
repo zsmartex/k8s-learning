@@ -1,0 +1,12 @@
+---
+- name: Istio
+  ansible.builtin.include_tasks: deploy/istio.yml
+
+- name: Nginx
+  ansible.builtin.include_tasks: deploy/nginx.yml
+
+- name: Monitoring
+  ansible.builtin.include_tasks: deploy/monitoring.yml
+
+- name: Kiali
+  ansible.builtin.include_tasks: deploy/kiali.yml

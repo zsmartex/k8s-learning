@@ -232,3 +232,5 @@ yamllint==1.29.0
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools
+
+kubernetes==26.1.0
