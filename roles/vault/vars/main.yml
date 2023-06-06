@@ -1,0 +1,12 @@
+---
+__vault_api_addr: >-
+  {{ vault_api_protocol }}://{{ vault_internal_ip }}:{{ vault_api_port }}
+
+__vault_cluster_addr: >-
+  {{ vault_cluster_protocol }}://{{ vault_cluster_address }}:{{ vault_cluster_port }}
+
+__vault_api:
+  status: "{{ __vault_api_addr }}/v1/sys/seal-status"
+  init: "{{ __vault_api_addr }}/v1/sys/init"
+  unseal: "{{ __vault_api_addr }}/v1/sys/unseal"
+  lookup_self: "{{ __vault_api_addr }}/v1/auth/token/lookup-self"

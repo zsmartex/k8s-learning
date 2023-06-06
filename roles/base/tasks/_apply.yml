@@ -2,7 +2,7 @@
 - name: Istio
   ansible.builtin.include_tasks: deploy/istio.yml
 
-- name: Nginx
+- name: Ingress Nginx
   ansible.builtin.include_tasks: deploy/nginx.yml
 
 - name: Monitoring

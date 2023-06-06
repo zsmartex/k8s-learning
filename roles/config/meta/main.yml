@@ -1,0 +1,19 @@
+galaxy_info:
+  role_name: environments
+  namespace: zstack
+  author: "Team"
+  description: >-
+    Init kubernetes pod environments
+  issue_tracker_url: >-
+    https://github.com/zsmartex/zstack/issues
+  min_ansible_version: "2.11"
+  license: MIT
+  # Provide a list of supported platforms, and for each platform a list of versions.
+  # If you don't wish to enumerate all versions for a particular platform, use 'all'.
+  # To view available platforms and versions (or releases), visit:
+  # https://galaxy.ansible.com/api/v1/platforms/
+  #
+  galaxy_tags:
+    - hashicorp
+    - vault
+dependencies: []

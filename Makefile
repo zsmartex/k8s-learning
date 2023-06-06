@@ -45,8 +45,14 @@ prepare: venv-check ### Install workspace env dependencies
 ##
 ## ——————————————————————————————— STAGE_0 - INIT ———————————————————————————————
 ##
+.PHONY: init_instance
 init_instance: ## Init inventory dir for instance
 	ansible-playbook playbooks/00_init_instance.yml
 
+.PHONY: 10_base
 10_base: ## Install istio + nginx + kiali + monitoring for kubernetes
-	ansible-playbook playbooks/10_base_install.yml
+	ansible-playbook ../../playbooks/10_base_install.yml
+
+.PHONY: 11_vault
+11_vault: ## Setup vault
+	ansible-playbook ../../playbooks/11_vault_setup.yml

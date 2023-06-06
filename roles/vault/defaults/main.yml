@@ -1,0 +1,18 @@
+---
+#
+#
+# * Path on the ansible controller
+vault_local_secret_dir: "{{ workspace_secrets_dir }}"
+
+vault_api_protocol: "https"
+vault_api_port: "8200"
+vault_api_address: "{{ vault_internal_ip }}"
+vault_api_listener: "{{ vault_api_address }}:{{ vault_api_port }}"
+#
+# ### Unseal
+#
+vault_unseal_method: "in-place"
+vault_unseal_key_shares: 5
+vault_unseal_key_threshold: 3
+
+vault_local_unseal_file: "{{ vault_local_secret_dir }}/root_vault.yml"

@@ -1,0 +1,3 @@
+---
+- name: In-place init-unseal
+  include_tasks: _inplace_init_unseal.yml

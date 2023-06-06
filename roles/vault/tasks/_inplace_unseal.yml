@@ -1,0 +1,40 @@
+---
+- name: Get vault status
+  ansible.builtin.uri:
+    url: "{{ __vault_api.status }}"
+    return_content: true
+  register: _current_vault_status
+  retries: 10
+  delay: 10
+  until:
+    - _current_vault_status.status == 200
+    - _current_vault_status.json.initialized
+
+- name: Target unseal keys to use
+  ansible.builtin.set_fact:
+    _vault_unseal_minimum_keys: >-
+      {{ vault_init_content.keys_base64[:(vault_unseal_key_threshold)] }}
+  # no_log: true
+
+- name: Vault unseal
+  ansible.builtin.uri:
+    url: "{{ __vault_api.unseal }}"
+    method: POST
+    body_format: json
+    body:
+      key: "{{ _current_unseal_key }}"
+    return_content: true
+  loop: "{{ _vault_unseal_minimum_keys }}"
+  loop_control:
+    loop_var: _current_unseal_key
+
+- name: Get vault status
+  ansible.builtin.uri:
+    url: "{{ __vault_api.status }}"
+    return_content: true
+  register: _current_vault_status
+  retries: 6
+  delay: 10
+  until:
+    - _current_vault_status.status == 200
+    - not _current_vault_status.json.sealed

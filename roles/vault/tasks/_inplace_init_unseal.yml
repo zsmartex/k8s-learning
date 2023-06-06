@@ -1,0 +1,23 @@
+---
+- name: Init vault node
+  ansible.builtin.include_tasks: "_inplace_init.yml"
+
+- name: Handling first init variable propagation
+  set_fact:
+    vault_init_content: "{{ (lookup('file', vault_local_unseal_file) | from_yaml).vault_init_content }}"
+  when:
+    - vault_init_content is not defined
+
+- name: Unseal vault node
+  ansible.builtin.include_tasks: "_inplace_unseal.yml"
+
+- name: Get vault status
+  ansible.builtin.uri:
+    url: "{{ __vault_api.status }}"
+    return_content: true
+  register: _current_vault_status
+  retries: 10
+  delay: 10
+  until:
+    - _current_vault_status.status == 200
+    - not _current_vault_status.json.sealed
