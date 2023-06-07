@@ -1,0 +1,10 @@
+---
+- name: Create database for z-dax
+  community.postgresql.postgresql_db:
+    name: "{{ item }}"
+    encoding: UTF-8
+  with_items:
+    - peatio
+    - barong
+    - kouda
+    - quantex
