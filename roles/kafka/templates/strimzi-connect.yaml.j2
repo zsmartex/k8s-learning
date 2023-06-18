@@ -1,0 +1,53 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: strimzi-cluster
+  namespace: "{{ namespace }}"
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  version: 3.4.0
+  replicas: 3
+  bootstrapServers: strimzi-cluster-kafka-bootstrap:9092
+  config:
+    group.id: connect-cluster
+    offset.storage.topic: connect-cluster-offsets
+    config.storage.topic: connect-cluster-configs
+    status.storage.topic: connect-cluster-status
+    config.storage.replication.factor: -1
+    offset.storage.replication.factor: -1
+    status.storage.replication.factor: -1
+    key.converter: io.confluent.connect.avro.AvroConverter
+    value.converter: io.confluent.connect.avro.AvroConverter
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
+  build:
+    output:
+      type: docker
+      image: huuhait/kafka-connect-custom:latest
+      pushSecret: "{{ docker_registry_secret }}"
+    plugins:
+      - name: debezium-postgres-connector
+        artifacts:
+          - type: zip
+            url: https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/2.2.1.Final/debezium-connector-postgres-2.2.1.Final-plugin.zip
+            sha512sum: 9f13a00e39fe7fd985ddb6216d59e917b04a548beb88e8c5cbf18e880a22bfcb942c10d11cb634de9139c03695ae9449da856179bd61bdc4ad1040ff5a8a275b
+      - name: kafka-questdb-connector
+        artifacts:
+          - type: jar
+            url: https://github.com/questdb/kafka-questdb-connector/releases/download/v0.6/kafka-questdb-connector-0.6-bin.zip
+            sha512sum: 55436adb874eea6682a7e557f8ed5a79a5605cde1f4280142284392c85fdcaefd6e1885dbf589125c7111479f0854e719c271fecee3d388d8916a6283966955d
+      - name: confluent-connect-avro-converter
+        artifacts:
+          - type: maven
+            repository: https://packages.confluent.io/maven
+            group: io.confluent
+            artifact: kafka-connect-avro-converter
+            version: 7.4.0
+      - name: kafka-connect-elasticsearch
+        artifacts:
+          - type: maven
+            repository: https://packages.confluent.io/maven
+            group: io.confluent
+            artifact: kafka-connect-elasticsearch
+            version: 14.0.3

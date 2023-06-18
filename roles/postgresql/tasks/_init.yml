@@ -1,0 +1,40 @@
+---
+- name: Check postgresql is inited
+  ansible.builtin.stat:
+    path: "{{ workspace_secrets_dir }}/postgresql_password.yml"
+  register: init_result
+  # no_log: true
+  run_once: true
+  become: false
+
+- name: Init postgresql
+  when: not init_result.stat.exists
+  block:
+    - name: Set password for postgresql
+      ansible.builtin.set_fact:
+        admin_password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits,punctuation') }}"
+        user_password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits,punctuation') }}"
+
+    - name: Create postgresql init-secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          type: Opaque
+          metadata:
+            name: "{{ auth_secret_name }}"
+            namespace: "{{ namespace }}"
+          data:
+            postgres-password: "{{ admin_password | b64encode }}"
+            password: "{{ user_password | b64encode }}"
+
+    - name: Store postgresql password
+      ansible.builtin.copy:
+        dest: "{{ workspace_secrets_dir }}/postgresql_password.yml"
+        content: |-
+          ---
+          {{ {'admin_password': admin_password, 'user_password': user_password} | to_nice_yaml }}
+        mode: 0600
+      become: false
+      delegate_to: localhost

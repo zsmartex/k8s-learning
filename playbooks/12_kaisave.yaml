@@ -1,0 +1,9 @@
+---
+- name: Stage 3 - Load secret to kaigara using vault
+  hosts: localhost
+  become: false
+  gather_facts: false
+  vars:
+    vault_internal_ip: http://vault.k8s-learn.com
+  roles:
+    - vault_setup

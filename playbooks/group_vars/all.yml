@@ -1,10 +1,8 @@
-workspace: zsmartex-stack
+workspace: z-dax
 collection_root: "{{ (playbook_dir) | realpath }}"
 
 # apply for install destroy for uninstall
 action: apply
-# Use for delete volume of kubernetes
-purge: false
 
 workspace_name: "ZSmartex Stack"
 workspace_root: "{{ lookup('env', 'PWD') }}"
@@ -12,5 +10,29 @@ kubernetes_namespace: "{{ workspace }}"
 workspace_host_vars_dir: "{{ workspace_root }}/host_vars"
 workspace_group_vars_dir: "{{ workspace_root }}/group_vars/{{ workspace }}"
 workspace_group_vars_dir_relative_dir: "./group_vars/{{ workspace }}"
+workspace_tf_modules_dir: "{{ workspace_group_vars_dir }}/terraform"
+workspace_charts_dir: "{{ workspace_group_vars_dir }}/charts"
 workspace_secrets_dir: "{{ workspace_group_vars_dir }}/secrets"
 workspace_secrets_dir_relative_dir: "{{ workspace_group_vars_dir_relative_dir }}/secrets"
+
+tf_module_src: "{{ collection_tf_modules_dir }}/{{ tf_module_name }}/"
+tf_module_dest: "{{ workspace_tf_modules_dir }}/{{ tf_module_name }}"
+
+namespace: test-zsmartex
+storage_class: k8slvm
+
+docker_registry_secret: docker-registry
+
+internal_domain: k8s-learn.com
+external_domain: zsmartex.com
+
+service_names:
+  postgresql: postgresql
+  vault: vault
+  questdb: questdb
+  elasticsearch: elasticsearch
+  kafka: kafka
+  strimzi-kafka-operator: strimzi-kafka-operator
+  schema-registry: schema-registry
+  kafka-connect: kafka-connect
+  console: redpanda-console

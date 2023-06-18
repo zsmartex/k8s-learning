@@ -1,3 +1,9 @@
 ---
+- name: Deploy vault using Helm chart
+  ansible.builtin.include_tasks: _deploy.yml
+
 - name: In-place init-unseal
-  include_tasks: _inplace_init_unseal.yml
+  ansible.builtin.include_tasks: _inplace_init_unseal.yml
+
+- name: Configure Vault using terraform
+  ansible.builtin.include_tasks: _tf_configure.yml

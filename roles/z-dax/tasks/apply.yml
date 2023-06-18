@@ -1,6 +1,0 @@
-- name: Deploy z-dax chart and dependencies
-  kubernetes.core.helm:
-    name: z-dax
-    chart_ref: z-dax
-    dependency_update: true
-    release_namespace: "{{ kubernetes_namespace }}"

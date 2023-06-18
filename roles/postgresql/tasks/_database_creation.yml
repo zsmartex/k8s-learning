@@ -1,0 +1,40 @@
+---
+- name: Handling first init variable propagation
+  ansible.builtin.set_fact:
+    postgresql_password: "{{ (lookup('file', postgresql_local_password_file) | from_yaml)['admin_password'] }}"
+  no_log: true
+
+- name: Create selection databases
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: "{{ item }}-database-creation"
+        namespace: "{{ namespace }}"
+      spec:
+        ttlSecondsAfterFinished: 120
+        template:
+          spec:
+            containers:
+              - name: "{{ item }}-database-creation"
+                image: bitnami/postgresql:latest
+                command: ["createdb"]
+                args:
+                  [
+                    "-h",
+                    "{{ service_names.postgresql }}",
+                    "-U",
+                    "postgres",
+                    "{{ item }}",
+                  ]
+                env:
+                  - name: PGPASSWORD
+                    value: "{{ postgresql_password }}"
+            restartPolicy: Never
+  with_items:
+    - peatio
+    - barong
+    - kouda
+    - quantex

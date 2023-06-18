@@ -1,2 +1,0 @@
-- name: Helm
-  include_tasks: _{{ action }}.yml

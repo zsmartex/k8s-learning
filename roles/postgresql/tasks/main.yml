@@ -1,0 +1,10 @@
+---
+- name: Init postgresql password secret
+  ansible.builtin.include_tasks: _init.yml
+
+- name: Deploy postgresql using Helm chart
+  ansible.builtin.include_tasks: _deploy.yml
+
+- name: Database creation
+  ansible.builtin.include_tasks: _database_creation.yml
+  when: database_creation

@@ -42,6 +42,8 @@ prepare: venv-check ### Install workspace env dependencies
 	@ansible-galaxy collection install -fr ${PWD}/requirements.yml
 	@ansible-galaxy role install -fr ${PWD}/requirements.yml
 
+	helm plugin install https://github.com/databus23/helm-diff
+
 ##
 ## ——————————————————————————————— STAGE_0 - INIT ———————————————————————————————
 ##

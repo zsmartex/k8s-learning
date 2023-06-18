@@ -1,0 +1,3 @@
+---
+- name: Deploy questdb using Helm chart
+  ansible.builtin.include_tasks: _deploy.yml

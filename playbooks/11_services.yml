@@ -1,0 +1,13 @@
+---
+- name: Stage 1 - Install Backend Services
+  hosts: localhost
+  become: false
+  gather_facts: false
+  vars:
+    database_creation: true
+  roles:
+    # - postgresql
+    # - questdb
+    # - elasticsearch
+    # - vault
+    - kafka

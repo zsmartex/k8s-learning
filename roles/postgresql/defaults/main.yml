@@ -1,0 +1,4 @@
+---
+auth_secret_name: postgresql-init
+
+postgresql_local_password_file: "{{ workspace_secrets_dir }}/postgresql_password.yml"

@@ -1,0 +1,46 @@
+---
+- name: Add bitnami chart repo
+  kubernetes.core.helm_repository:
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+
+- name: Add cetic chart repo
+  kubernetes.core.helm_repository:
+    name: cetic
+    repo_url: https://cetic.github.io/helm-charts
+
+- name: Deploy latest version of bitnami/postgresql chart
+  kubernetes.core.helm:
+    name: "{{ service_names.postgresql }}"
+    chart_ref: bitnami/postgresql
+    chart_version: 12.5.1
+    release_namespace: "{{ namespace }}"
+    values:
+      auth:
+        existingSecret: "{{ auth_secret_name }}"
+      primary:
+        service:
+          type: LoadBalancer
+        persistence:
+          storageClass: "{{ storage_class }}"
+          size: 10Gi
+      volumePermissions:
+        enabled: true
+
+- name: Deploy latest version of cetic/adminer chart
+  kubernetes.core.helm:
+    name: adminer
+    chart_ref: cetic/adminer
+    chart_version: 0.2.1
+    release_namespace: "{{ namespace }}"
+    values:
+      config:
+        design: pepa-linha-dark
+        externalserver: postgresql
+      service:
+        type: ClusterIP
+      ingress:
+        enabled: true
+        className: nginx
+        hosts:
+          - "adminer.{{ external_domain }}"

@@ -1,0 +1,6 @@
+---
+__kafka_connect_chart: kafka-connect
+__kafka_connect_chart_dir: "{{ workspace_charts_dir }}/kafka-connect"
+
+__schema_registry_chart: schema-registry
+__schema_registry_chart_dir: "{{ workspace_charts_dir }}/schema-registry"

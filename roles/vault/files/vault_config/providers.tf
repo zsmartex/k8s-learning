@@ -7,6 +7,4 @@ terraform {
   }
 }
 
-provider "vault" {
-  address = var.vault_addr
-}
+provider "vault" {}

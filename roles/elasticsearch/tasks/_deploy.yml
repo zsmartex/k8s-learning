@@ -1,0 +1,42 @@
+---
+- name: Add bitnami chart repo
+  kubernetes.core.helm_repository:
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+
+- name: Deploy latest version of bitnami/elasticsearch chart
+  kubernetes.core.helm:
+    name: "{{ service_names.elasticsearch }}"
+    chart_ref: bitnami/elasticsearch
+    chart_version: 19.8.1
+    release_namespace: "{{ namespace }}"
+    values:
+      master:
+        replicaCount: 3
+        persistence:
+          storageClass: "{{ storage_class }}"
+          size: 10Gi
+        autoscaling:
+          enabled: false
+          minReplicas: 3
+          maxReplicas: 10
+      data:
+        replicaCount: 3
+        persistence:
+          storageClass: "{{ storage_class }}"
+          size: 10Gi
+        autoscaling:
+          enabled: false
+          minReplicas: 3
+          maxReplicas: 10
+      ingress:
+        enabled: true
+        tls: false
+        ingressClassName: nginx
+        extraHosts:
+          - name: "elasticsearch.{{ internal_domain }}"
+            path: /
+        secrets: []
+      security:
+        tls:
+          restEncryption: false

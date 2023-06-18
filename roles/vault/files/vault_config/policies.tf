@@ -2,28 +2,28 @@ locals {
   policies = [
     {
       name = "barong"
-      path = "policies/barong.tpl"
+      path = "policies/barong.hcl"
     },
     {
       name = "peatio"
-      path = "policies/peatio.tpl"
+      path = "policies/peatio.hcl"
     },
     {
       name = "peatio_crypto"
-      path = "policies/peatio_crypto.tpl"
+      path = "policies/peatio_crypto.hcl"
     },
     {
       name = "quantex_runner"
-      path = "policies/quantex_runner.tpl"
+      path = "policies/quantex_runner.hcl"
     },
     {
       name = "quantex"
-      path = "policies/quantex.tpl"
+      path = "policies/quantex.hcl"
     }
   ]
 }
 
-resource "vault_policy" "peatio" {
+resource "vault_policy" "z-dax" {
   for_each = { for policy in local.policies : policy.name => policy }
   name     = each.value.name
 
@@ -32,7 +32,7 @@ resource "vault_policy" "peatio" {
   })
 }
 
-resource "vault_token" "peatio" {
+resource "vault_token" "z-dax" {
   for_each        = { for policy in local.policies : policy.name => policy }
   policies        = [each.value.name]
   renewable       = true

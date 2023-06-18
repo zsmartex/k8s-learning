@@ -1,0 +1,33 @@
+---
+- name: Add hashicorp chart repo
+  kubernetes.core.helm_repository:
+    name: hashicorp
+    repo_url: https://helm.releases.hashicorp.com
+
+- name: Deploy latest version of hashicorp/vault chart
+  kubernetes.core.helm:
+    name: "{{ service_names.vault }}"
+    chart_ref: hashicorp/vault
+    chart_version: 0.24.1
+    release_namespace: "{{ namespace }}"
+    values:
+      server:
+        standalone:
+          enabled: true
+        service:
+          dataStorage:
+            enabled: true
+            size: 10Gi
+            storageClass: "{{ storage_class }}"
+          auditStorage:
+            enabled: true
+            size: 10Gi
+            storageClass: "{{ storage_class }}"
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          hosts:
+            - host: "{{ service_names.vault }}.{{ internal_domain }}"
+              path: /
+      ui:
+        enabled: true

@@ -1,0 +1,77 @@
+---
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
+- name: Handling first init variable propagation
+  ansible.builtin.set_fact:
+    vault_init_content: "{{ lookup('file', vault_local_unseal_file) | from_yaml }}"
+  no_log: true
+  when:
+    - vault_init_content is not defined
+
+- name: Wait for load balancer warm up
+  ansible.builtin.uri:
+    url: "{{ vault_api_protocol }}://{{ vault_api_address }}:{{ vault_api_port }}/v1/auth/token/lookup-self"
+    headers:
+      X-Vault-Token: "{{ vault_init_content.root_token }}"
+  register: _vault_ping_api
+  until: _vault_ping_api.status == 200
+  retries: 2
+  delay: 10
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Copy terraform sources # noqa risky-file-permissions
+  ansible.builtin.copy:
+    src: "{{ __vault_terraform_module }}/"
+    dest: "{{ __vault_terraform_module_work_dir }}/"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: "Do Terraform"
+  community.general.terraform:
+    project_path: "{{ __vault_terraform_module_work_dir }}"
+    state: "present"
+    force_init: true
+    provider_upgrade: true
+    workspace: "{{ workspace }}"
+    variables:
+      app_name: "{{ workspace }}"
+      postgresql_username: postgres
+      postgresql_password: "{{ admin_password }}"
+      postgresql_host: "{{ service_names.postgresql }}"
+      postgresql_port: 5432
+  environment:
+    VAULT_ADDR: "{{ vault_api_protocol }}://{{ vault_api_address }}:{{ vault_api_port }}"
+    VAULT_TOKEN: "{{ vault_init_content.root_token }}"
+  register: tf_result
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Cook variables
+  ansible.builtin.set_fact:
+    _tf_vault_outputs:
+      barong_vault_token: "{{ tf_result.outputs.vault_token.value.barong }}"
+      peatio_vault_token: "{{ tf_result.outputs.vault_token.value.peatio }}"
+      peatio_crypto_vault_token: "{{ tf_result.outputs.vault_token.value.peatio_crypto }}"
+      quantex_vault_token: "{{ tf_result.outputs.vault_token.value.quantex }}"
+      quantex_runner_vault_token: "{{ tf_result.outputs.vault_token.value.quantex_runner }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Generate host_vars for public_ns
+  ansible.builtin.copy:
+    dest: "{{ vault_local_secret_dir }}/vault_tokens.yml"
+    content: |-
+      ---
+      {{ _tf_vault_outputs | to_nice_yaml(indent=2) }}
+    mode: 0600
+  delegate_to: localhost
+  become: false
+  run_once: true

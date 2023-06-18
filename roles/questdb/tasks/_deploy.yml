@@ -1,0 +1,23 @@
+---
+- name: Add questdb chart repo
+  kubernetes.core.helm_repository:
+    name: questdb
+    repo_url: https://helm.questdb.io
+
+- name: Deploy latest version of questdb/questdb chart
+  kubernetes.core.helm:
+    name: "{{ service_names.questdb }}"
+    chart_ref: questdb/questdb
+    chart_version: 0.30.0
+    release_namespace: "{{ namespace }}"
+    values:
+      persistence:
+        enabled: true
+        size: 10Gi
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts:
+          - host: "questdb.{{ internal_domain }}"
+            paths:
+              - /

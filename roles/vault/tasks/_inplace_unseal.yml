@@ -14,7 +14,7 @@
   ansible.builtin.set_fact:
     _vault_unseal_minimum_keys: >-
       {{ vault_init_content.keys_base64[:(vault_unseal_key_threshold)] }}
-  # no_log: true
+  no_log: true
 
 - name: Vault unseal
   ansible.builtin.uri:

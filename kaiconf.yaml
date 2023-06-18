@@ -1,0 +1,4 @@
+secret_store: vault
+deployment_id: z-dax
+scopes: public,private-secret
+aes_key: changeme

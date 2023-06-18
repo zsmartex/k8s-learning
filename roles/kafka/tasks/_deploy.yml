@@ -1,0 +1,98 @@
+---
+- name: Add strimzi chart repo
+  kubernetes.core.helm_repository:
+    name: strimzi
+    repo_url: https://strimzi.io/charts
+
+- name: Add rhcharts chart repo
+  kubernetes.core.helm_repository:
+    name: rhcharts
+    repo_url: https://ricardo-aires.github.io/helm-charts
+
+- name: Add redpanda chart repo
+  kubernetes.core.helm_repository:
+    name: redpanda
+    repo_url: https://charts.redpanda.com
+
+- name: Deploy latest version of strimzi/strimzi-kafka-operator chart
+  kubernetes.core.helm:
+    name: "{{ service_names['strimzi-kafka-operator'] }}"
+    chart_ref: strimzi/strimzi-kafka-operator
+    chart_version: 0.35.0
+    release_namespace: "{{ namespace }}"
+    values:
+      replicas: 1
+      mavenBuilder:
+        image:
+          registry: docker.io
+          repository: zsmartex
+          image: maven-builder
+          tag: latest
+
+- name: Copy schema-registry chart source
+  ansible.builtin.copy:
+    src: "{{ __schema_registry_chart }}/"
+    dest: "{{ __schema_registry_chart_dir }}/"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Deploy latest version of rhcharts/schema-registry chart
+  kubernetes.core.helm:
+    name: "{{ service_names['schema-registry'] }}"
+    chart_ref: "{{ __schema_registry_chart_dir }}"
+    release_namespace: "{{ namespace }}"
+    values:
+      replicaCount: 3
+      kafka:
+        enabled: false
+        bootstrapServers: PLAINTEXT://strimzi-cluster-kafka-bootstrap:9092
+
+- name: Deploy latest version of redpanda/console chart
+  kubernetes.core.helm:
+    name: "{{ service_names.console }}"
+    chart_ref: redpanda/console
+    chart_version: 0.6.4
+    release_namespace: "{{ namespace }}"
+    values:
+      console:
+        config:
+          kafka:
+            brokers:
+              - strimzi-cluster-kafka-bootstrap:9092
+            schemaRegistry:
+              enabled: true
+              urls: ["http://schema-registry:8081"]
+            protobuf:
+              enabled: true
+              schemaRegistry:
+                enabled: true
+                refreshInterval: 5m
+          connect:
+            enabled: true
+            clusters:
+              - name: connect-cluster
+                url: http://strimzi-cluster-connect-api:8083
+      ingress:
+        enabled: true
+        className: nginx
+        hosts:
+          - host: "console.{{ internal_domain }}"
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+
+- name: Deploy kafka using strimzi-kafka-operator
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', './strimzi-kafka.yaml.j2') | from_yaml }}"
+
+- name: Deploy kafka-connect using strimzi-kafka-operator
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', './strimzi-connect.yaml.j2') | from_yaml }}"
+
+- name: Deploy kafka-connect network policy
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', './strimzi-connect-network-policy.yaml.j2') | from_yaml }}"

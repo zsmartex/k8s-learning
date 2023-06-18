@@ -1,10 +1,19 @@
 ---
+- name: Wait vault api ready
+  ansible.builtin.uri:
+    url: "{{ __vault_api.status }}"
+  register: result
+  until: "result.status == 200"
+  retries: 5
+  delay: 10
+
 - name: Init vault node
   ansible.builtin.include_tasks: "_inplace_init.yml"
 
 - name: Handling first init variable propagation
-  set_fact:
-    vault_init_content: "{{ (lookup('file', vault_local_unseal_file) | from_yaml).vault_init_content }}"
+  ansible.builtin.set_fact:
+    vault_init_content: "{{ lookup('file', vault_local_unseal_file) | from_yaml }}"
+  no_log: true
   when:
     - vault_init_content is not defined
 

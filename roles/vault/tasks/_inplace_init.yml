@@ -1,6 +1,6 @@
 ---
 - name: Get vault status
-  uri:
+  ansible.builtin.uri:
     url: "{{ __vault_api.status }}"
     return_content: true
   register: _current_vault_status
@@ -14,7 +14,7 @@
     - not _current_vault_status.json.initialized
   block:
     - name: Vault init
-      uri:
+      ansible.builtin.uri:
         url: "{{ __vault_api.init }}"
         method: POST
         body_format: json
@@ -29,21 +29,21 @@
         - _current_vault_init.status == 200
 
     - name: Variable cooking
-      set_fact:
+      ansible.builtin.set_fact:
         vault_init_content: "{{ _current_vault_init.json }}"
 
     - name: Store vault init keys
-      copy:
+      ansible.builtin.copy:
         dest: "{{ vault_local_unseal_file }}"
         mode: 0600
         content: |-
           ---
-          {{ {'vault_init_content': vault_init_content} | to_nice_yaml }}
+          {{ vault_init_content | to_nice_yaml }}
       become: false
       delegate_to: localhost
 
     - name: Get vault status
-      uri:
+      ansible.builtin.uri:
         url: "{{ __vault_api.status }}"
         return_content: true
       register: _current_vault_status

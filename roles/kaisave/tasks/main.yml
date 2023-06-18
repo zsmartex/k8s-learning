@@ -1,0 +1,7 @@
+---
+- name: Save secrets content to Vault
+  ansible.builtin.command:
+    cmd: kai save
+    environment:
+      KAIGARA_VAULT_TOKEN: "{{ kaigara_vault_token }}"
+      KAIGARA_VAULT_ADDR: "{{ kaigara_vault_addr }}"

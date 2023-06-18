@@ -1,5 +1,0 @@
-- name: Remove z-dax release and waiting suppression ending
-  kubernetes.core.helm:
-    name: z-dax
-    state: absent
-    wait: true

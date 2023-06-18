@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: strimzi-cluster-connect-console
+  namespace: "{{ namespace }}"
+spec:
+  podSelector:
+    matchLabels:
+      strimzi.io/cluster: strimzi-cluster
+      strimzi.io/kind: KafkaConnect
+      strimzi.io/name: strimzi-cluster-connect
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8083
+      from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: console

@@ -1,0 +1,3 @@
+---
+- name: Deploy elasticsearch using Helm chart
+  ansible.builtin.include_tasks: _deploy.yml
