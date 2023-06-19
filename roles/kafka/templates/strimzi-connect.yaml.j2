@@ -1,14 +1,14 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaConnect
 metadata:
-  name: strimzi-cluster
+  name: "{{ service_names['strimzi-cluster'] }}"
   namespace: "{{ namespace }}"
   annotations:
     strimzi.io/use-connector-resources: "true"
 spec:
   version: 3.4.0
   replicas: 3
-  bootstrapServers: strimzi-cluster-kafka-bootstrap:9092
+  bootstrapServers: "{{ service_names['strimzi-cluster'] }}-kafka-bootstrap:9092"
   config:
     group.id: connect-cluster
     offset.storage.topic: connect-cluster-offsets

@@ -24,7 +24,7 @@
   become: false
   run_once: true
 
-- name: Copy terraform sources # noqa risky-file-permissions
+- name: Copy terraform sources
   ansible.builtin.copy:
     src: "{{ __vault_terraform_module }}/"
     dest: "{{ __vault_terraform_module_work_dir }}/"
@@ -42,7 +42,7 @@
     variables:
       app_name: "{{ workspace }}"
       postgresql_username: postgres
-      postgresql_password: "{{ admin_password }}"
+      postgresql_password: "{{ postgresql_init_content.admin_password }}"
       postgresql_host: "{{ service_names.postgresql }}"
       postgresql_port: 5432
   environment:
@@ -61,6 +61,7 @@
       peatio_crypto_vault_token: "{{ tf_result.outputs.vault_token.value.peatio_crypto }}"
       quantex_vault_token: "{{ tf_result.outputs.vault_token.value.quantex }}"
       quantex_runner_vault_token: "{{ tf_result.outputs.vault_token.value.quantex_runner }}"
+      kaigara_vault_token: "{{ tf_result.outputs.vault_token.value.kaigara }}"
   delegate_to: localhost
   become: false
   run_once: true

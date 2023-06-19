@@ -1,0 +1,17 @@
+---
+- name: Add bitnami chart repo
+  kubernetes.core.helm_repository:
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+
+- name: Deploy latest version of bitnami/redis chart
+  kubernetes.core.helm:
+    name: "{{ service_names.redis }}"
+    chart_ref: bitnami/redis
+    chart_version: 17.11.5
+    release_namespace: "{{ namespace }}"
+    values:
+      master:
+        count: 3
+      replica:
+        replicaCount: 3

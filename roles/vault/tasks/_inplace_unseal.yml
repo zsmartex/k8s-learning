@@ -1,4 +1,9 @@
 ---
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
 - name: Get vault status
   ansible.builtin.uri:
     url: "{{ __vault_api.status }}"

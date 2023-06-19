@@ -1,0 +1,12 @@
+---
+__secrets_file: "{{ workspace_secrets_dir }}/kaigara_secrets.yml"
+
+__deposit_address_grpc_addr: "deposit_address:{{ service_ports.deposit_address }}"
+__withdraw_grpc_addr: "withdraw:{{ service_ports.withdraw }}"
+__trade_executor_grpc_addr: "withdraw:{{ service_ports.trade_executor }}"
+__order_processor_grpc_addr: "withdraw:{{ service_ports.order_processor }}"
+__matching_grpc_addr: "withdraw:{{ service_ports.matching }}"
+__code_grpc_addr: "withdraw:{{ service_ports.code }}"
+__p2p_grpc_addr: "withdraw:{{ service_ports.p2p }}"
+__conversation_grpc_addr: "withdraw:{{ service_ports.conversation }}"
+__notify_grpc_addr: "withdraw:{{ service_ports.notify }}"

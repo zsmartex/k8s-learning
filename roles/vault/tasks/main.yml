@@ -5,5 +5,8 @@
 - name: In-place init-unseal
   ansible.builtin.include_tasks: _inplace_init_unseal.yml
 
+- name: Configure Vault endpoints
+  ansible.builtin.include_tasks: _endpoints.yml
+
 - name: Configure Vault using terraform
   ansible.builtin.include_tasks: _tf_configure.yml

@@ -1,7 +1,17 @@
 ---
+- name: Generate secrets file
+  ansible.builtin.template:
+    src: "secrets.yml.j2"
+    dest: "{{ __secrets_file }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
 - name: Save secrets content to Vault
   ansible.builtin.command:
-    cmd: kai save
-    environment:
-      KAIGARA_VAULT_TOKEN: "{{ kaigara_vault_token }}"
-      KAIGARA_VAULT_ADDR: "{{ kaigara_vault_addr }}"
+    cmd: "kai save -f {{ __secrets_file }}"
+  environment:
+    KAIGARA_STORAGE_DRIVER: vault
+    KAIGARA_DEPLOYMENT_ID: "{{ workspace }}"
+    KAIGARA_VAULT_TOKEN: "{{ vault_init_content.root_token }}"
+    KAIGARA_VAULT_ADDR: "{{ kaigara_vault_addr }}"

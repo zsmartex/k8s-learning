@@ -3,15 +3,15 @@ path "sys/health" {
   capabilities = ["read", "list"]
 }
 # Manage the transit secrets engine
-path "transit/keys/{app_name}_*" {
+path "transit/keys/${app_name}_*" {
   capabilities = ["create", "read", "list"]
 }
 # Encrypt API keys
-path "transit/encrypt/{app_name}_apikeys_*" {
+path "transit/encrypt/${app_name}_apikeys_*" {
   capabilities = ["create", "read", "update"]
 }
 # Decrypt API keys
-path "transit/decrypt/{app_name}_apikeys_*" {
+path "transit/decrypt/${app_name}_apikeys_*" {
   capabilities = ["create", "read", "update"]
 }
 # Renew tokens

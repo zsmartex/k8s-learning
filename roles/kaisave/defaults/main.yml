@@ -1,2 +1,9 @@
+---
 kaigara_vault_token: changeme
 kaigara_vault_addr: http://127.0.0.1:8200
+
+kafka_brokers: "{{ service_names['strimzi-cluster'] }}-kafka-brokers:9092"
+
+vault_app_name: ZSmartex
+event_api_jwt_public_key: DEFAULT_BASE64
+jwt_public_key: DEFAULT_BASE64

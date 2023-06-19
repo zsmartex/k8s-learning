@@ -1,29 +1,29 @@
 # Manage the transit secrets engine
-path "transit/keys/{app_name}_*" {
+path "transit/keys/${app_name}_*" {
   capabilities = ["create", "read", "list"]
 }
 # Encrypt engines secrets
-path "transit/encrypt/{app_name}_engines_*" {
+path "transit/encrypt/${app_name}_engines_*" {
   capabilities = ["create", "read", "update"]
 }
 # Encrypt wallets secrets
-path "transit/encrypt/{app_name}_wallets_*" {
+path "transit/encrypt/${app_name}_wallets_*" {
   capabilities = ["create", "read", "update"]
 }
 # Encrypt beneficiaries data
-path "transit/encrypt/{app_name}_beneficiaries_*" {
+path "transit/encrypt/${app_name}_beneficiaries_*" {
   capabilities = [ "create", "read", "update" ]
 }
 # Decrypt beneficiaries data
-path "transit/decrypt/{app_name}_beneficiaries_*" {
+path "transit/decrypt/${app_name}_beneficiaries_*" {
   capabilities = [ "create", "read", "update" ]
 }
 # Encrypt blockchains data
-path "transit/encrypt/{app_name}_blockchains_*" {
+path "transit/encrypt/${app_name}_blockchains_*" {
   capabilities = [ "create", "read", "update" ]
 }
 # Decrypt blockchains data
-path "transit/decrypt/{app_name}_blockchains_*" {
+path "transit/decrypt/${app_name}_blockchains_*" {
   capabilities = [ "create", "read", "update" ]
 }
 # Renew tokens

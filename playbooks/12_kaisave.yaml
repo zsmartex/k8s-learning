@@ -3,7 +3,12 @@
   hosts: localhost
   become: false
   gather_facts: false
+  pre_tasks:
+    - name: Reload workspace vars
+      ansible.builtin.include_vars:
+        dir: "{{ workspace_group_vars_dir }}"
+        ignore_unknown_extensions: true
   vars:
-    vault_internal_ip: http://vault.k8s-learn.com
+    kaigara_vault_addr: "http://vault.{{ internal_domain }}"
   roles:
-    - vault_setup
+    - kaisave

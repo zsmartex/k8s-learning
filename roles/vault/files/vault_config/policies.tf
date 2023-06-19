@@ -1,6 +1,10 @@
 locals {
   policies = [
     {
+      name = "kaigara"
+      path = "policies/kaigara.hcl"
+    },
+    {
       name = "barong"
       path = "policies/barong.hcl"
     },

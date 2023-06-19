@@ -8,12 +8,13 @@ workspace_name: "ZSmartex Stack"
 workspace_root: "{{ lookup('env', 'PWD') }}"
 kubernetes_namespace: "{{ workspace }}"
 workspace_host_vars_dir: "{{ workspace_root }}/host_vars"
+workspace_host_vars_dir_relative_dir: "./host_vars"
 workspace_group_vars_dir: "{{ workspace_root }}/group_vars/{{ workspace }}"
 workspace_group_vars_dir_relative_dir: "./group_vars/{{ workspace }}"
-workspace_tf_modules_dir: "{{ workspace_group_vars_dir }}/terraform"
-workspace_charts_dir: "{{ workspace_group_vars_dir }}/charts"
 workspace_secrets_dir: "{{ workspace_group_vars_dir }}/secrets"
 workspace_secrets_dir_relative_dir: "{{ workspace_group_vars_dir_relative_dir }}/secrets"
+workspace_tf_modules_dir: "{{ workspace_host_vars_dir }}/terraform"
+workspace_charts_dir: "{{ workspace_host_vars_dir }}/charts"
 
 tf_module_src: "{{ collection_tf_modules_dir }}/{{ tf_module_name }}/"
 tf_module_dest: "{{ workspace_tf_modules_dir }}/{{ tf_module_name }}"
@@ -26,13 +27,40 @@ docker_registry_secret: docker-registry
 internal_domain: k8s-learn.com
 external_domain: zsmartex.com
 
-service_names:
+service_names: # Only for backend services like database
   postgresql: postgresql
   vault: vault
   questdb: questdb
   elasticsearch: elasticsearch
+  redis: redis
   kafka: kafka
   strimzi-kafka-operator: strimzi-kafka-operator
+  strimzi-cluster: strimzi-cluster
   schema-registry: schema-registry
   kafka-connect: kafka-connect
   console: redpanda-console
+
+service_ports: # Only for application services
+  deposit_address: 9000
+  withdraw: 9001
+  trade_executor: 9002
+  order_processor: 9003
+  matching: 9004
+  code: 9005
+  p2p: 9006
+  conversation: 9007
+  notify: 9008
+  quantex_runner: 9010
+
+object_storage:
+  bucket: zsmartex
+  endpoint: sgp1.digitaloceanspaces.com
+  region: sgp1
+  access_key: DO00KNY6QY9WY74X3ULM
+  access_secret: 1oRKb2zH8H2VcgR4goLnC6r4DNQr7TfeSWsUKUCRQbo
+  version: 1
+
+twilio:
+  phone_number: +16106248045
+  account_sid: ACb8e046899dc2b3de11f42e1da1371692
+  auth_token: 43167b519ece020e695004a99b293666

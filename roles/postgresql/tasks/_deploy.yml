@@ -1,4 +1,9 @@
 ---
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
 - name: Add bitnami chart repo
   kubernetes.core.helm_repository:
     name: bitnami
@@ -17,7 +22,7 @@
     release_namespace: "{{ namespace }}"
     values:
       auth:
-        existingSecret: "{{ auth_secret_name }}"
+        postgresPassword: "{{ postgresql_init_content.admin_password }}"
       primary:
         service:
           type: LoadBalancer
@@ -43,4 +48,4 @@
         enabled: true
         className: nginx
         hosts:
-          - "adminer.{{ external_domain }}"
+          - "adminer.{{ internal_domain }}"

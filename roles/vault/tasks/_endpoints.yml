@@ -1,0 +1,26 @@
+---
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
+- name: Configure vault endpoint
+  ansible.builtin.command:
+    cmd: "vault secrets {{ item.command }} {{ item.options }} {{ item.endpoint }}"
+  environment:
+    VAULT_ADDR: "http://vault.{{ internal_domain }}"
+    VAULT_TOKEN: "{{ vault_init_content.root_token }}"
+  loop:
+    - command: enable
+      endpoint: totp
+      options: ""
+    - command: enable
+      endpoint: transit
+      options: ""
+    - command: disable
+      endpoint: secret
+      options: ""
+    - command: enable
+      endpoint: kv
+      options: -version=2 -path=secret
+  ignore_errors: true

@@ -10,4 +10,6 @@
     # - questdb
     # - elasticsearch
     # - vault
-    - kafka
+    # - redis
+    - secrets
+    # - kafka

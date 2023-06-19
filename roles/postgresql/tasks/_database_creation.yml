@@ -1,8 +1,8 @@
 ---
-- name: Handling first init variable propagation
-  ansible.builtin.set_fact:
-    postgresql_password: "{{ (lookup('file', postgresql_local_password_file) | from_yaml)['admin_password'] }}"
-  no_log: true
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
 
 - name: Create selection databases
   kubernetes.core.k8s:
@@ -31,7 +31,7 @@
                   ]
                 env:
                   - name: PGPASSWORD
-                    value: "{{ postgresql_password }}"
+                    value: "{{ postgresql_init_content.admin_password }}"
             restartPolicy: Never
   with_items:
     - peatio
