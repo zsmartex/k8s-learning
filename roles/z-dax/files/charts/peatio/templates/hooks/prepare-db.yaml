@@ -1,0 +1,39 @@
+{{- if .Values.enableMigration }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "peatio.name" . }}-prepare-db
+  labels:
+    {{- include "peatio.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "0"
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app: {{ template "fullname" . }}
+        component: peatio
+    spec:
+      {{- with .Values.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: OnFailure
+      containers:
+        - name: prepare-db
+          image: {{ template "image" . }}
+          command:
+            - sh
+            - -exc
+            - kaigara ./peatio createdb && kaigara ./peatio migration && kaigara ./peatio seed
+          env:
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretPrefix }}-global
+                  key: peatioVaultToken
+{{ include "server.env" . | indent 12 }}
+{{- end }}

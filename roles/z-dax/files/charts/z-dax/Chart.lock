@@ -1,0 +1,27 @@
+dependencies:
+- name: adminer
+  repository: https://cetic.github.io/helm-charts
+  version: 0.2.1
+- name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 12.5.1
+- name: elasticsearch
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 19.8.1
+- name: strimzi-kafka-operator
+  repository: https://strimzi.io/charts
+  version: 0.35.0
+- name: schema-registry
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 11.0.0
+- name: console
+  repository: https://charts.redpanda.com
+  version: 0.6.4
+- name: vault
+  repository: https://helm.releases.hashicorp.com
+  version: 0.24.1
+- name: questdb
+  repository: https://helm.questdb.io
+  version: 0.30.0
+digest: sha256:ae00196a9a484b593d1819b0ea9503f85048c09ba44fb13d4ee0a2b0daec4984
+generated: "2023-06-06T03:25:11.523724463+07:00"

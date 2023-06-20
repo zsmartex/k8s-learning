@@ -1,0 +1,7 @@
+global:
+  secretPrefix: z-dax
+  infra:
+    vaultHost: vault
+
+  deploymentId: z-dax
+  kaigaraSecretStore: vault

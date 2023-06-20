@@ -1,0 +1,10 @@
+apiVersion: v2
+appVersion: "1.16.0"
+version: 0.1.0
+name: z-dax
+description: Helm as stack for zsmartex cryptocurrency exchange
+
+dependencies:
+  - name: peatio
+    version: 0.1.0
+    repository: file://../peatio
