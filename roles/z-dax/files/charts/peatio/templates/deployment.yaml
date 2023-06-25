@@ -13,12 +13,17 @@ spec:
       {{- include "peatio.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "peatio.selectorLabels" . | nindent 8 }}
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "z-dax"
+        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_peatio"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{`{{- with secret "postgres/creds/z-dax_peatio" -}}
+            export DATABASE_USER="{{ .Data.username }}"
+            export DATABASE_PASS="{{ .Data.password }}"
+          {{- end }}`}}
     spec:
       {{- with .Values.image.PullSecrets }}
       imagePullSecrets:
@@ -33,27 +38,38 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - source /vault/secrets/config && kaigara ./peatio api -p 3000
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/public/timestamp
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/public/timestamp
               port: http
           env:
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.global.secretPrefix }}-global
-                  key: peatioServerVaultToken
-{{ include "server.env" . | indent 12 }}
+                  key: peatioVaultToken
+            {{ include "server.env" . | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config/abilities.yml
+              subPath: abilities.yml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "peatio.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -66,3 +82,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      serviceAccountName: z-dax

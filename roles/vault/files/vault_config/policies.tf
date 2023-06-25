@@ -23,6 +23,10 @@ locals {
     {
       name = "quantex"
       path = "policies/quantex.hcl"
+    },
+    {
+      name = "z-dax_service_account" # for service account
+      path = "policies/service_account.hcl"
     }
   ]
 }

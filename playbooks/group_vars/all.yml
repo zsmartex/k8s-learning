@@ -64,3 +64,7 @@ twilio:
   phone_number: +16106248045
   account_sid: ACb8e046899dc2b3de11f42e1da1371692
   auth_token: 43167b519ece020e695004a99b293666
+
+kubernetes:
+  host: "https://192.168.4.241:6443"
+  ca_cert_file: "{{ workspace_secrets_dir }}/kubernetes_ca_cert.crt"

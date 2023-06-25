@@ -9,7 +9,7 @@
     # - postgresql
     # - questdb
     # - elasticsearch
-    # - vault
+    - vault
     # - redis
-    - secrets
+    # - secrets
     # - kafka

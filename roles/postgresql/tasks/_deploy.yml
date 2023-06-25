@@ -40,7 +40,7 @@
     release_namespace: "{{ namespace }}"
     values:
       config:
-        design: pepa-linha-dark
+        design: konya
         externalserver: postgresql
       service:
         type: ClusterIP

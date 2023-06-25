@@ -11,6 +11,9 @@
     chart_version: 0.24.1
     release_namespace: "{{ namespace }}"
     values:
+      injector:
+        enabled: true
+        replicas: 2
       server:
         standalone:
           enabled: true

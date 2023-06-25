@@ -38,9 +38,12 @@ resource "vault_database_secret_backend_connection" "postgres" {
 }
 
 resource "vault_database_secret_backend_role" "postgres_role" {
-  for_each            = { for role in local.roles : role.name => role }
-  backend             = vault_mount.postgres.path
-  name                = each.value.name
-  db_name             = each.value.database
-  creation_statements = ["CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';"]
+  for_each = { for role in local.roles : role.name => role }
+  backend  = vault_mount.postgres.path
+  name     = each.value.name
+  db_name  = each.value.database
+  creation_statements = [
+    "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';",
+    "GRANT ALL PRIVILEGES ON *.* TO \"{{name}}\";",
+  ]
 }

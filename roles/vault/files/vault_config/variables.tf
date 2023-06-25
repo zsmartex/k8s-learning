@@ -25,3 +25,18 @@ variable "postgresql_password" {
 variable "app_name" {
   type = string
 }
+
+variable "kubernetes_host" {
+  type      = string
+  sensitive = true
+}
+
+variable "kubernetes_ca_cert" {
+  type      = string
+  sensitive = true
+}
+
+variable "kubernetes_namespace" {
+  type      = string
+  sensitive = true
+}

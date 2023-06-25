@@ -24,6 +24,16 @@
   become: false
   run_once: true
 
+- name: Create K8S Vault ServiceAccount
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: z-dax
+        namespace: "{{ namespace }}"
+
 - name: Copy terraform sources
   ansible.builtin.copy:
     src: "{{ __vault_terraform_module }}/"
@@ -45,6 +55,9 @@
       postgresql_password: "{{ postgresql_init_content.admin_password }}"
       postgresql_host: "{{ service_names.postgresql }}"
       postgresql_port: 5432
+      kubernetes_host: "{{ kubernetes.host }}"
+      kubernetes_ca_cert: "{{ lookup('file', kubernetes.ca_cert_file) }}"
+      kubernetes_namespace: "{{ namespace }}"
   environment:
     VAULT_ADDR: "{{ vault_api_protocol }}://{{ vault_api_address }}:{{ vault_api_port }}"
     VAULT_TOKEN: "{{ vault_init_content.root_token }}"

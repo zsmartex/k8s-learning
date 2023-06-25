@@ -1,0 +1,46 @@
+{{- $labels := include "peatio.labels" . }}
+{{- $releaseName := .Release.Name }}
+{{- $env := include "daemons.env" . }}
+{{- $image := printf "%s:%s" .Values.image.repository .Values.image.tag }}
+{{- $values := .Values }}
+
+{{- range $daemon := .Values.daemons }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "peatio.fullname" . }}-daemon-{{ $daemon | replace "_" "-" }}
+  labels:
+    {{- $labels | nindent 4 }}
+spec:
+  relicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "peatio.name" . }}-daemon
+      daemon: {{ $daemon | replace "_" "-" }}
+      release: {{ $releaseName }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ include "peatio.name" . }}-daemon
+        daemon: {{ $daemon | replace "_" "-" }}
+        release: {{ $releaseName }}
+    spec:
+      {{- with $values.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: "{{ $daemon | replace "_" "-" }}-daemon"
+          image: {{ $image }}
+          imagePullPolicy: {{ $values.image.pullPolicy }}
+          command:
+            - sh
+            - -exc
+            - kaigara ./{{ $daemon }}
+          resources:
+            {{- toYaml $values.resources | nindent 12 }}
+          env:
+            {{ $env | nindent 12 }}
+{{- end }}

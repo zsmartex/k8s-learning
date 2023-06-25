@@ -7,4 +7,3 @@ description: Helm as stack for zsmartex cryptocurrency exchange
 dependencies:
   - name: peatio
     version: 0.1.0
-    repository: file://../peatio

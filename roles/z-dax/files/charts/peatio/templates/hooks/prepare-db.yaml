@@ -14,8 +14,17 @@ spec:
     metadata:
       name: "{{ .Release.Name }}"
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ include "peatio.fullname" . }}
         component: peatio
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "z-dax"
+        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_peatio"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{`{{- with secret "postgres/creds/z-dax_peatio" -}}
+            export DATABASE_USER="{{ .Data.username }}"
+            export DATABASE_PASS="{{ .Data.password }}"
+          {{- end }}`}}
     spec:
       {{- with .Values.image.PullSecrets }}
       imagePullSecrets:
@@ -24,16 +33,31 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: prepare-db
-          image: {{ template "image" . }}
-          command:
-            - sh
-            - -exc
-            - kaigara ./peatio createdb && kaigara ./peatio migration && kaigara ./peatio seed
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - source /vault/secrets/config && kaigara ./peatio migration && kaigara ./peatio seed && echo "done"
           env:
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.global.secretPrefix }}-global
                   key: peatioVaultToken
-{{ include "server.env" . | indent 12 }}
+            {{ include "server.env" . | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config/seed/markets.yml
+              subPath: markets.yml
+            - name: config
+              mountPath: /app/config/seed/currencies.yml
+              subPath: currencies.yml
+            - name: config
+              mountPath: /app/config/seed/accounts.yml
+              subPath: accounts.yml
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "peatio.fullname" . }}
+      serviceAccountName: z-dax
 {{- end }}

@@ -2,7 +2,7 @@
 Expand the name of the chart.
 */}}
 {{- define "peatio.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- printf "peatio" -}}
 {{- end }}
 
 {{/*
@@ -11,16 +11,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "peatio.fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- $name := default .Chart.Name .Values.nameOverride }}
-{{- if contains $name .Release.Name }}
-{{- .Release.Name | trunc 63 | trimSuffix "-" }}
-{{- else }}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
-{{- end }}
-{{- end }}
+{{- printf "peatio" -}}
 {{- end }}
 
 {{/*
@@ -65,7 +56,7 @@ Create the name of the service account to use
 Environment for peatio container
 */}}
 {{- define "env" -}}
-- name: KAIGARA_SECRET_STORE
+- name: KAIGARA_STORAGE_DRIVER
   value: {{ default "vault" .Values.global.kaigaraSecretStore }}
 - name: KAIGARA_VAULT_ADDR
   value: {{ printf "http://%s:8200" .Values.global.infra.vaultHost }}
@@ -74,12 +65,13 @@ Environment for peatio container
     secretKeyRef:
       name: {{ .Values.global.secretPrefix }}-global
       key: kaigaraVaultToken
-- name: KAIGARA_APP_NAME
-  value: {{ default "peatio" .Values.kaigara.appName }}
 - name: KAIGARA_DEPLOYMENT_ID
   value: {{ default "z-dax" .Values.global.deploymentId }}
 - name: KAIGARA_SCOPES
   value: {{ default "private,secret" .Values.kaigara.scopes }}
+# TODO: remove soon during k8s problem need to repeat
+- name: QUESTDB_PORT
+  value: "9000"
 {{- end -}}
 
 {{/*

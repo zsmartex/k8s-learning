@@ -1,0 +1,7 @@
+---
+- name: Stage 4 - Run Z-Dax
+  hosts: localhost
+  become: false
+  gather_facts: false
+  roles:
+    - z-dax
