@@ -1,0 +1,86 @@
+---
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
+- name: Copy polices sources
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  vars:
+    app_name: "{{ workspace }}"
+  with_items:
+      - { src: "policies/barong.hcl.j2", dest: "{{ workspace_host_vars_dir }}/policies/barong.hcl" }
+      - { src: "policies/peatio.hcl.j2", dest: "{{ workspace_host_vars_dir }}/policies/peatio.hcl" }
+      - { src: "policies/peatio_crypto.hcl.j2", dest: "{{ workspace_host_vars_dir }}/policies/peatio_crypto.hcl" }
+      - { src: "policies/kaigara.hcl.j2", dest: "{{ workspace_host_vars_dir }}/policies/kaigara.hcl" }
+      - { src: "policies/quantex.hcl.j2", dest: "{{ workspace_host_vars_dir }}/policies/quantex.hcl" }
+      - { src: "policies/quantex_runner.hcl.j2", dest: "{{ workspace_host_vars_dir }}/policies/quantex_runner.hcl" }
+      - { src: "policies/service_account.hcl.j2", dest: "{{ workspace_host_vars_dir }}/policies/service_account.hcl" }
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Write policies
+  ansible.builtin.command:
+    cmd: "vault policy write {{ item.name }} {{ workspace_host_vars_dir }}/{{ item.file }}"
+  environment:
+    VAULT_ADDR: "http://vault.{{ internal_domain }}"
+    VAULT_TOKEN: "{{ vault_init_content.root_token }}"
+  loop:
+    - name: barong
+      file: policies/barong.hcl
+    - name: peatio
+      file: policies/peatio.hcl
+    - name: peatio_crypto
+      file: policies/peatio_crypto.hcl
+    - name: kaigara
+      file: policies/kaigara.hcl
+    - name: quantex
+      file: policies/quantex.hcl
+    - name: quantex_runner
+      file: policies/quantex_runner.hcl
+    - name: z-dax_service_account
+      file: policies/service_account.hcl
+
+- name: Create vault tokens
+  ansible.builtin.command:
+    cmd: "vault token create -policy={{ item }} -renewable=true -ttl=240h -period=240h -format=yaml"
+  environment:
+    VAULT_ADDR: "http://vault.{{ internal_domain }}"
+    VAULT_TOKEN: "{{ vault_init_content.root_token }}"
+  register: token_result
+  loop:
+    - barong
+    - peatio
+    - peatio_crypto
+    - kaigara
+    - quantex
+    - quantex_runner
+
+- debug: var=token_result
+
+- name: Cook variables
+  ansible.builtin.set_fact:
+    _vault_token_outputs:
+      barong_vault_token: "{{ ((token_result.results | selectattr('item', 'equalto', 'barong') | first).stdout | from_yaml).auth.client_token }}"
+      peatio_vault_token: "{{ ((token_result.results | selectattr('item', 'equalto', 'peatio') | first).stdout | from_yaml).auth.client_token }}"
+      peatio_crypto_vault_token: "{{ ((token_result.results | selectattr('item', 'equalto', 'peatio_crypto') | first).stdout | from_yaml).auth.client_token }}"
+      quantex_vault_token: "{{ ((token_result.results | selectattr('item', 'equalto', 'quantex') | first).stdout | from_yaml).auth.client_token }}"
+      quantex_runner_vault_token: "{{ ((token_result.results | selectattr('item', 'equalto', 'quantex_runner') | first).stdout | from_yaml).auth.client_token }}"
+      kaigara_vault_token: "{{ ((token_result.results | selectattr('item', 'equalto', 'kaigara') | first).stdout | from_yaml).auth.client_token }}"
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Generate host_vars for public_ns
+  ansible.builtin.copy:
+    dest: "{{ vault_local_secret_dir }}/vault_tokens.yml"
+    content: |-
+      ---
+      {{ _vault_token_outputs | to_nice_yaml(indent=2) }}
+    mode: 0600
+  delegate_to: localhost
+  become: false
+  run_once: true

@@ -13,14 +13,15 @@
     - name: Set password for postgresql
       ansible.builtin.set_fact:
         postgresql_init_content:
-          admin_password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits,punctuation') }}"
+          users:
+            postgres: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits,!@#$%^&*()_-+=[]()<>.,?/') }}"
 
     - name: Store postgresql password
       ansible.builtin.copy:
         dest: "{{ workspace_secrets_dir }}/postgresql_init_content.yml"
         content: |-
           ---
-          {{ {'postgresql_init_content': postgresql_init_content} | to_nice_yaml }}
+          {{ {'postgresql_init_content': postgresql_init_content} | to_nice_yaml(indent=2) }}
         mode: 0600
       become: false
       delegate_to: localhost

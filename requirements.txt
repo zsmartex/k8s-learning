@@ -234,3 +234,5 @@ yamllint==1.29.0
 # setuptools
 
 kubernetes==26.1.0
+
+psycopg2-binary==2.9.6

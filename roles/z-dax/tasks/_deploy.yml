@@ -23,3 +23,16 @@
     name: "{{ workspace }}"
     chart_ref: "{{ workspace_charts_dir }}/z-dax"
     release_namespace: "{{ namespace }}"
+    values:
+      global:
+        svcPorts:
+          deposit_address: "{{ service_ports.deposit_address }}"
+          withdraw: "{{ service_ports.withdraw }}"
+          trade_executor: "{{ service_ports.trade_executor }}"
+          order_processor: "{{ service_ports.order_processor }}"
+          matching: "{{ service_ports.matching }}"
+          code: "{{ service_ports.code }}"
+          p2p: "{{ service_ports.p2p }}"
+          conversation: "{{ service_ports.conversation }}"
+          notify: "{{ service_ports.notify }}"
+          quantex_runner: "{{ service_ports.quantex_runner }}"

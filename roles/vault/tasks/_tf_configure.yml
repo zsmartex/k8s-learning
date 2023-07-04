@@ -50,9 +50,8 @@
     provider_upgrade: true
     workspace: "{{ workspace }}"
     variables:
-      app_name: "{{ workspace }}"
       postgresql_username: postgres
-      postgresql_password: "{{ postgresql_init_content.admin_password }}"
+      postgresql_password: "{{ postgresql_init_content.users.postgres }}"
       postgresql_host: "{{ service_names.postgresql }}"
       postgresql_port: 5432
       kubernetes_host: "{{ kubernetes.host }}"
@@ -61,31 +60,6 @@
   environment:
     VAULT_ADDR: "{{ vault_api_protocol }}://{{ vault_api_address }}:{{ vault_api_port }}"
     VAULT_TOKEN: "{{ vault_init_content.root_token }}"
-  register: tf_result
-  delegate_to: localhost
-  become: false
-  run_once: true
-
-- name: Cook variables
-  ansible.builtin.set_fact:
-    _tf_vault_outputs:
-      barong_vault_token: "{{ tf_result.outputs.vault_token.value.barong }}"
-      peatio_vault_token: "{{ tf_result.outputs.vault_token.value.peatio }}"
-      peatio_crypto_vault_token: "{{ tf_result.outputs.vault_token.value.peatio_crypto }}"
-      quantex_vault_token: "{{ tf_result.outputs.vault_token.value.quantex }}"
-      quantex_runner_vault_token: "{{ tf_result.outputs.vault_token.value.quantex_runner }}"
-      kaigara_vault_token: "{{ tf_result.outputs.vault_token.value.kaigara }}"
-  delegate_to: localhost
-  become: false
-  run_once: true
-
-- name: Generate host_vars for public_ns
-  ansible.builtin.copy:
-    dest: "{{ vault_local_secret_dir }}/vault_tokens.yml"
-    content: |-
-      ---
-      {{ _tf_vault_outputs | to_nice_yaml(indent=2) }}
-    mode: 0600
   delegate_to: localhost
   become: false
   run_once: true

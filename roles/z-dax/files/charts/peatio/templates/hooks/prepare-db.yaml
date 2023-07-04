@@ -16,15 +16,6 @@ spec:
       labels:
         app: {{ include "peatio.fullname" . }}
         component: peatio
-      annotations:
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "z-dax"
-        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_peatio"
-        vault.hashicorp.com/agent-inject-template-config: |
-          {{`{{- with secret "postgres/creds/z-dax_peatio" -}}
-            export DATABASE_USER="{{ .Data.username }}"
-            export DATABASE_PASS="{{ .Data.password }}"
-          {{- end }}`}}
     spec:
       {{- with .Values.image.PullSecrets }}
       imagePullSecrets:
@@ -37,14 +28,14 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-            - source /vault/secrets/config && kaigara ./peatio migration && kaigara ./peatio seed && echo "done"
+            - kaigara ./peatio migration && kaigara ./peatio seed && echo "seeding done"
           env:
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.global.secretPrefix }}-global
                   key: peatioVaultToken
-            {{ include "server.env" . | nindent 12 }}
+            {{ include "prepare.env" . | nindent 12 }}
           volumeMounts:
             - name: config
               mountPath: /app/config/seed/markets.yml

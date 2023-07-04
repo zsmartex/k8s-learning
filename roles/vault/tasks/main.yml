@@ -8,5 +8,8 @@
 - name: Configure Vault endpoints
   ansible.builtin.include_tasks: _endpoints.yml
 
+- name: Configure Vault polices
+  ansible.builtin.include_tasks: _policies.yml
+
 - name: Configure Vault using terraform
   ansible.builtin.include_tasks: _tf_configure.yml

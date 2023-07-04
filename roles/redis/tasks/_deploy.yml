@@ -1,4 +1,9 @@
 ---
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
 - name: Add bitnami chart repo
   kubernetes.core.helm_repository:
     name: bitnami
@@ -15,3 +20,6 @@
         count: 3
       replica:
         replicaCount: 3
+      auth:
+        existingSecret: redis-password
+        existingSecretPasswordKey: password

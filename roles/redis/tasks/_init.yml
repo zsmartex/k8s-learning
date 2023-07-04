@@ -1,0 +1,38 @@
+---
+- name: Check redis is inited
+  ansible.builtin.stat:
+    path: "{{ workspace_secrets_dir }}/redis_init_content.yml"
+  register: init_result
+  no_log: true
+  run_once: true
+  become: false
+
+- name: Init redis
+  when: not init_result.stat.exists
+  block:
+    - name: Set password for redis
+      ansible.builtin.set_fact:
+        redis_init_content:
+          password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits,!@#$%^&*()_-+=[]()<>.,?/') }}"
+
+    - name: Store redis password
+      ansible.builtin.copy:
+        dest: "{{ workspace_secrets_dir }}/redis_init_content.yml"
+        content: |-
+          ---
+          {{ {'redis_init_content': redis_init_content} | to_nice_yaml(indent=2) }}
+        mode: 0600
+      become: false
+      delegate_to: localhost
+
+    - name: Save redis password as kubernetes secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: redis-password
+            namespace: "{{ namespace }}"
+          data:
+            password: "{{ redis_init_content.password | b64encode }}"

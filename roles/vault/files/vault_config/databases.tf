@@ -2,19 +2,24 @@ locals {
   roles = [
     {
       database = "peatio",
-      name     = "z-dax_peatio"
+      name     = "z-dax_peatio",
+      manager  = "peatio_manager",
+
     },
     {
       database = "barong",
       name     = "z-dax_barong"
+      manager  = "barong_manager",
     },
     {
       database = "kouda",
       name     = "z-dax_kouda"
+      manager  = "kouda_manager",
     },
     {
       database = "quantex",
-      name     = "z-dax_quantex"
+      name     = "z-dax_quantex",
+      manager  = "quantex_manager",
     },
   ]
 }
@@ -44,6 +49,6 @@ resource "vault_database_secret_backend_role" "postgres_role" {
   db_name  = each.value.database
   creation_statements = [
     "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';",
-    "GRANT ALL PRIVILEGES ON *.* TO \"{{name}}\";",
+    "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{{name}}\";"
   ]
 }

@@ -57,13 +57,34 @@ resources:
 
 daemons:
   - cron_jobs
+  # - system_notify
 streamDaemons:
   - order_processor
   - matching
   - trade_executor
   - deposit_address
   - withdraw
-  - system_notify
+  - p2p
+  - conversation
+  - notify
+
+global:
+  secretPrefix: z-dax
+  infra:
+    vaultHost: vault
+
+  deploymentId: z-dax
+  kaigaraSecretStore: vault
+
+  svcPorts:
+    deposit_address: 9000
+    withdraw: 9001
+    trade_executor: 9002
+    order_processor: 9003
+    matching: 9004
+    p2p: 9006
+    conversation: 9007
+    notify: 9008
 
 autoscaling:
   enabled: false

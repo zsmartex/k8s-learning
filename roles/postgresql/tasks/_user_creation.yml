@@ -1,0 +1,49 @@
+---
+- name: Reload workspace vars
+  ansible.builtin.include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
+- name: Generate postgresql users for z-dax
+  block:
+    - name: Set password for postgresql
+      ansible.builtin.set_fact:
+        password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits,!@#$%^&*()_-+=[]()<>.,?/') }}"
+
+    - name: Set users as a variable
+      ansible.builtin.set_fact:
+        users: "{{ postgresql_init_content.users }}"
+      when: users is undefined
+
+    - name: Store password for postgresql into init content
+      ansible.builtin.set_fact:
+        users: "{{ users | combine({ item.name: password }) }}"
+
+    - name: Create selection user
+      community.postgresql.postgresql_user:
+        login_host: "{{ service_names.postgresql }}.{{ internal_domain }}"
+        port: 5432
+        login_user: "postgres"
+        login_password: "{{ users.postgres }}"
+        name: "{{ item.name }}"
+        password: "{{ password }}"
+
+    - name: Create selection database
+      community.postgresql.postgresql_db:
+        name: "{{ item.database }}"
+        login_host: "{{ service_names.postgresql }}.{{ internal_domain }}"
+        port: 5432
+        login_user: "postgres"
+        login_password: "{{ users.postgres }}"
+        owner: "{{ item.name }}"
+
+    - name: Store postgresql password
+      ansible.builtin.copy:
+        dest: "{{ workspace_secrets_dir }}/postgresql_init_content.yml"
+        content: |-
+          ---
+          {{ {'postgresql_init_content': { 'users': users }} | to_nice_yaml(indent=2) }}
+        mode: 0600
+      become: false
+      delegate_to: localhost
+  when: not postgresql_init_content.users.get(item.name)

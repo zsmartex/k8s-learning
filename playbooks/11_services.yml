@@ -6,10 +6,10 @@
   vars:
     database_creation: true
   roles:
-    # - postgresql
-    # - questdb
-    # - elasticsearch
+    - postgresql
+    - questdb
+    - elasticsearch
     - vault
-    # - redis
-    # - secrets
-    # - kafka
+    - redis
+    - secrets
+    - kafka

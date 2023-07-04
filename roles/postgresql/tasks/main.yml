@@ -5,6 +5,14 @@
 - name: Deploy postgresql using Helm chart
   ansible.builtin.include_tasks: _deploy.yml
 
-- name: Database creation
-  ansible.builtin.include_tasks: _database_creation.yml
-  when: database_creation
+- name: User creation
+  ansible.builtin.include_tasks: _user_creation.yml
+  with_items:
+    - name: barong_manager
+      database: barong
+    - name: peatio_manager
+      database: peatio
+    - name: kouda_manager
+      database: kouda
+    - name: quantex_manager
+      database: quantex

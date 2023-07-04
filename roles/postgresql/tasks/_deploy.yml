@@ -18,11 +18,11 @@
   kubernetes.core.helm:
     name: "{{ service_names.postgresql }}"
     chart_ref: bitnami/postgresql
-    chart_version: 12.5.1
+    chart_version: 12.5.9
     release_namespace: "{{ namespace }}"
     values:
       auth:
-        postgresPassword: "{{ postgresql_init_content.admin_password }}"
+        postgresPassword: "{{ postgresql_init_content.users.postgres }}"
       primary:
         service:
           type: LoadBalancer

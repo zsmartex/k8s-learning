@@ -1,3 +1,6 @@
 ---
+- name: Init redis password secret
+  ansible.builtin.include_tasks: _init.yml
+
 - name: Deploy redis using Helm chart
   ansible.builtin.include_tasks: _deploy.yml

@@ -91,3 +91,12 @@ Environment for peatio daemon container
   value: {{ default "peatio,peatio_daemons" .Values.kaigara.daemonsAppName }}
 {{ include "env" . }}
 {{- end -}}
+
+{{/*
+Environment for peatio prepare db container
+*/}}
+{{- define "prepare.env" -}}
+- name: KAIGARA_APP_NAME
+  value: {{ default "peatio,peatio_seed" .Values.kaigara.daemonsAppName }}
+{{ include "env" . }}
+{{- end -}}

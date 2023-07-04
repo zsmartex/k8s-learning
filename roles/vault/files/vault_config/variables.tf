@@ -22,10 +22,6 @@ variable "postgresql_password" {
   default   = "password"
 }
 
-variable "app_name" {
-  type = string
-}
-
 variable "kubernetes_host" {
   type      = string
   sensitive = true
