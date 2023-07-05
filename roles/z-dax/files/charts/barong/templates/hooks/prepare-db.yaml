@@ -1,0 +1,54 @@
+{{- if .Values.enableMigration }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "barong.name" . }}-prepare-db
+  labels:
+    {{- include "barong.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "0"
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app: {{ include "barong.fullname" . }}
+        component: barong
+    spec:
+      {{- with .Values.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: OnFailure
+      containers:
+        - name: prepare-db
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - kaigara ./barong migration && kaigara ./barong seed && echo "seeding done"
+          env:
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretPrefix }}-global
+                  key: barongVaultToken
+            {{ include "prepare.env" . | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config/seed/markets.yml
+              subPath: markets.yml
+            - name: config
+              mountPath: /app/config/seed/currencies.yml
+              subPath: currencies.yml
+            - name: config
+              mountPath: /app/config/seed/accounts.yml
+              subPath: accounts.yml
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "barong.fullname" . }}
+      serviceAccountName: z-dax
+{{- end }}

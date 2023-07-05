@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "peatio.fullname" . }}
+  name: {{ include "barong.fullname" . }}
   labels:
-    {{- include "peatio.labels" . | nindent 4 }}
+    {{- include "barong.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "peatio.selectorLabels" . | nindent 6 }}
+      {{- include "barong.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "peatio.selectorLabels" . | nindent 8 }}
+        {{- include "barong.selectorLabels" . | nindent 8 }}
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "z-dax"
-        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_peatio"
+        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_barong"
         vault.hashicorp.com/agent-inject-template-config: |
-          {{`{{- with secret "postgres/creds/z-dax_peatio" -}}
+          {{`{{- with secret "postgres/creds/z-dax_barong" -}}
             export DATABASE_USER="{{ .Data.username }}"
             export DATABASE_PASS="{{ .Data.password }}"
           {{- end }}`}}
@@ -29,7 +29,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "peatio.serviceAccountName" . }}
+      serviceAccountName: {{ include "barong.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -40,7 +40,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-            - source /vault/secrets/config && kaigara ./peatio api -p 3000
+            - source /vault/secrets/config && kaigara ./barong api -p 3000
           ports:
             - name: api
               containerPort: {{ .Values.service.port }}
@@ -58,7 +58,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.global.secretPrefix }}-global
-                  key: peatioVaultToken
+                  key: barongVaultToken
             {{ include "server.env" . | nindent 12 }}
           volumeMounts:
             - name: config
@@ -69,7 +69,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ template "peatio.fullname" . }}
+            name: {{ template "barong.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

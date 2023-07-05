@@ -1,4 +1,4 @@
-{{- $labels := include "peatio.labels" . }}
+{{- $labels := include "barong.labels" . }}
 {{- $releaseName := .Release.Name }}
 {{- $env := include "daemons.env" . }}
 {{- $image := printf "%s:%s" .Values.image.repository .Values.image.tag }}
@@ -10,7 +10,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "peatio.fullname" . }}-stream-daemon-{{ $streamDaemon | replace "_" "-" }}
+  name: {{ template "barong.fullname" . }}-stream-daemon-{{ $streamDaemon | replace "_" "-" }}
   labels:
     {{- $labels | nindent 4 }}
     daemon: {{ $streamDaemon | replace "_" "-" }}
@@ -18,7 +18,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "peatio.name" . }}-stream-daemon
+      app: {{ template "barong.name" . }}-stream-daemon
       daemon: {{ $streamDaemon | replace "_" "-" }}
       release: {{ $releaseName }}
   strategy:
@@ -26,15 +26,15 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "peatio.name" . }}-stream-daemon
+        app: {{ template "barong.name" . }}-stream-daemon
         daemon: {{ $streamDaemon | replace "_" "-" }}
         release: {{ $releaseName }}
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "z-dax"
-        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_peatio"
+        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_barong"
         vault.hashicorp.com/agent-inject-template-config: |
-          {{`{{- with secret "postgres/creds/z-dax_peatio" -}}
+          {{`{{- with secret "postgres/creds/z-dax_barong" -}}
             export DATABASE_USER="{{ .Data.username }}"
             export DATABASE_PASS="{{ .Data.password }}"
           {{- end }}`}}

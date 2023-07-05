@@ -16,4 +16,5 @@ global:
     p2p: 9006
     conversation: 9007
     notify: 9008
+    activity_recorder: 9009
     quantex_runner: 9010

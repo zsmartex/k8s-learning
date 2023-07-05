@@ -1,0 +1,21 @@
+{{- $values := .Values }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "peatio.fullname" . }}-daemon
+  labels:
+    {{- include "peatio.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+{{- range $streamDaemon := $values.streamDaemons }}
+{{- $port := (index $values.global.svcPorts $streamDaemon) }}
+    - port: {{ $port }}
+      targetPort: {{ $streamDaemon | replace "_" "-" }}
+      protocol: TCP
+      name: {{ $streamDaemon | replace "_" "-" }}
+{{- end }}
+  selector:
+    {{- include "peatio.selectorLabels" . | nindent 4 }}

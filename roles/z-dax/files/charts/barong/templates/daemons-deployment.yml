@@ -1,40 +1,39 @@
-{{- $labels := include "peatio.labels" . }}
+{{- $labels := include "barong.labels" . }}
 {{- $releaseName := .Release.Name }}
 {{- $env := include "daemons.env" . }}
 {{- $image := printf "%s:%s" .Values.image.repository .Values.image.tag }}
 {{- $values := .Values }}
 
-{{- range $streamDaemon := $values.streamDaemons }}
-{{- $port := (index $values.global.svcPorts $streamDaemon) }}
+{{- range $daemon := .Values.daemons }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "peatio.fullname" . }}-stream-daemon-{{ $streamDaemon | replace "_" "-" }}
+  name: {{ include "barong.fullname" . }}-daemon-{{ $daemon | replace "_" "-" }}
   labels:
     {{- $labels | nindent 4 }}
-    daemon: {{ $streamDaemon | replace "_" "-" }}
+    daemon: {{ $daemon | replace "_" "-" }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "peatio.name" . }}-stream-daemon
-      daemon: {{ $streamDaemon | replace "_" "-" }}
+      app: {{ include "barong.name" . }}-daemon
+      daemon: {{ $daemon | replace "_" "-" }}
       release: {{ $releaseName }}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: {{ template "peatio.name" . }}-stream-daemon
-        daemon: {{ $streamDaemon | replace "_" "-" }}
+        app: {{ include "barong.name" . }}-daemon
+        daemon: {{ $daemon | replace "_" "-" }}
         release: {{ $releaseName }}
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "z-dax"
-        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_peatio"
+        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_barong"
         vault.hashicorp.com/agent-inject-template-config: |
-          {{`{{- with secret "postgres/creds/z-dax_peatio" -}}
+          {{`{{- with secret "postgres/creds/z-dax_barong" -}}
             export DATABASE_USER="{{ .Data.username }}"
             export DATABASE_PASS="{{ .Data.password }}"
           {{- end }}`}}
@@ -44,20 +43,12 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: "{{ $streamDaemon | replace "_" "-" }}-stream-daemon"
+        - name: "{{ $daemon | replace "_" "-" }}-daemon"
           image: {{ $image }}
           imagePullPolicy: {{ $values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-            - source /vault/secrets/config && kaigara ./{{ $streamDaemon }} -p {{ $port }}
-          ports:
-            - name: {{ $streamDaemon | replace "_" "-" }}
-              containerPort: {{ $port }}
-          livenessProbe:
-            grpc:
-              port: {{ $port }}
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            - source /vault/secrets/config && kaigara ./{{ $daemon }}
           resources:
             {{- toYaml $values.resources | nindent 12 }}
           env:

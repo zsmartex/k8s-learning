@@ -1,4 +1,4 @@
-# Default values for peatio.
+# Default values for barong.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -7,7 +7,7 @@ replicaCount: 1
 enableMigration: true
 
 image:
-  repository: zsmartex/peatio
+  repository: zsmartex/barong
   pullPolicy: Always # IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -18,7 +18,7 @@ podSecurityContext:
   # fsGroup: 2000
 
 kaigara:
-  appName: peatio
+  appName: barong
 
 securityContext:
   {}
@@ -32,7 +32,7 @@ securityContext:
 service:
   type: ClusterIP
   port: 3000
-  name: peatio
+  name: barong
 
 resources:
   {}
@@ -47,18 +47,11 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
-daemons:
-  - cron_jobs
+daemons: []
   # - system_notify
 streamDaemons:
-  - order_processor
-  - matching
-  - trade_executor
-  - deposit_address
-  - withdraw
-  - p2p
-  - conversation
-  - notify
+  - code
+  - activity_recorder
 
 global:
   secretPrefix: z-dax
@@ -69,14 +62,8 @@ global:
   kaigaraSecretStore: vault
 
   svcPorts:
-    deposit_address: 9000
-    withdraw: 9001
-    trade_executor: 9002
-    order_processor: 9003
-    matching: 9004
-    p2p: 9006
-    conversation: 9007
-    notify: 9008
+    code: 9001
+    activity_recorder: 9002
 
 autoscaling:
   enabled: false

@@ -39,6 +39,10 @@ service_names: # Only for backend services like database
   schema-registry: schema-registry
   kafka-connect: kafka-connect
   console: redpanda-console
+  peatio: peatio # Do not change thís
+  barong: barong # Do not change this
+  kouda: kouda # Do not change this
+  quantex: quantex # Do not change this
 
 service_ports: # Only for application services
   deposit_address: 9000
@@ -50,6 +54,7 @@ service_ports: # Only for application services
   p2p: 9006
   conversation: 9007
   notify: 9008
+  activity_recorder: 9009
   quantex_runner: 9010
 
 object_storage:
