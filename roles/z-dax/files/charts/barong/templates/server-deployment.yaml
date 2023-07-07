@@ -40,19 +40,19 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-            - source /vault/secrets/config && kaigara ./barong api -p 3000
+            - source /vault/secrets/config && kaigara ./barong api -p {{ .Values.service.ports.api }}
           ports:
             - name: api
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.ports.api }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /api/public/timestamp
-              port: http
+              path: /api/v2/public/timestamp
+              port: api
           readinessProbe:
             httpGet:
-              path: /api/public/timestamp
-              port: http
+              path: /api/v2/public/timestamp
+              port: api
           env:
             - name: VAULT_TOKEN
               valueFrom:
@@ -62,8 +62,11 @@ spec:
             {{ include "server.env" . | nindent 12 }}
           volumeMounts:
             - name: config
-              mountPath: /app/config/abilities.yml
-              subPath: abilities.yml
+              mountPath: /app/config/barong.yml
+              subPath: barong.yml
+            - name: config
+              mountPath: /app/config/authz_rules.yml
+              subPath: authz_rules.yml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -82,4 +85,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: z-dax

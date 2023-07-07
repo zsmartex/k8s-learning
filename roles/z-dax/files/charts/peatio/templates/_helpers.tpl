@@ -45,11 +45,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "peatio.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "peatio.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
 {{- default "default" .Values.serviceAccount.name }}
-{{- end }}
 {{- end }}
 
 {{/*
@@ -79,7 +75,7 @@ Environment for peatio rails container
 */}}
 {{- define "server.env" -}}
 - name: KAIGARA_APP_NAME
-  value: {{ default "peatio" .Values.kaigara.peatioAppName }}
+  value: {{ default "peatio" .Values.kaigara.appName }}
 {{ include "env" . }}
 {{- end -}}
 
@@ -97,6 +93,6 @@ Environment for peatio prepare db container
 */}}
 {{- define "prepare.env" -}}
 - name: KAIGARA_APP_NAME
-  value: {{ default "peatio,peatio_seed" .Values.kaigara.daemonsAppName }}
+  value: {{ default "peatio,peatio_seed" .Values.kaigara.seedAppName }}
 {{ include "env" . }}
 {{- end -}}

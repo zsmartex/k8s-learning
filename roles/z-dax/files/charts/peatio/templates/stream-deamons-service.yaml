@@ -11,9 +11,9 @@ spec:
   type: {{ .Values.service.type }}
   ports:
 {{- range $streamDaemon := $values.streamDaemons }}
-{{- $port := (index $values.global.svcPorts $streamDaemon) }}
+{{- $port := (index $values.service.ports $streamDaemon) }}
     - port: {{ $port }}
-      targetPort: {{ $streamDaemon | replace "_" "-" }}
+      targetPort: {{ $streamDaemon | replace "_" "-" | trunc 15 }}
       protocol: TCP
       name: {{ $streamDaemon | replace "_" "-" }}
 {{- end }}

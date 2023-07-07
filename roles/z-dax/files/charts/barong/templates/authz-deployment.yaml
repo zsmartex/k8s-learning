@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "barong.fullname" . }}-authz
+  labels:
+    {{- include "barong.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "barong.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "barong.selectorLabels" . | nindent 8 }}
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "z-dax"
+        vault.hashicorp.com/agent-inject-secret-config: "postgres/creds/z-dax_barong"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{`{{- with secret "postgres/creds/z-dax_barong" -}}
+            export DATABASE_USER="{{ .Data.username }}"
+            export DATABASE_PASS="{{ .Data.password }}"
+          {{- end }}`}}
+    spec:
+      {{- with .Values.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "barong.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - source /vault/secrets/config && kaigara ./barong api -p {{ .Values.service.ports.authz }}
+          ports:
+            - name: authz-api
+              containerPort: {{ .Values.service.ports.authz }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/v2/public/timestamp
+              port: authz-api
+          readinessProbe:
+            httpGet:
+              path: /api/v2/public/timestamp
+              port: authz-api
+          env:
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretPrefix }}-global
+                  key: barongVaultToken
+            {{ include "server.env" . | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config/barong.yml
+              subPath: barong.yml
+              readOnly: true
+            - name: config
+              mountPath: /app/config/authz_rules.yml
+              subPath: authz_rules.yml
+              readOnly: true
+            - name: jwt-private-key
+              mountPath: /secrets/jwt.key
+              subPath: jwt.key
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "barong.fullname" . }}
+        - name: jwt-private-key
+          secret:
+            secretName: jwt-private-key
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

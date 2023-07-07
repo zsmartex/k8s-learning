@@ -5,16 +5,3 @@ global:
 
   deploymentId: z-dax
   kaigaraSecretStore: vault
-
-  svcPorts:
-    deposit_address: 9000
-    withdraw: 9001
-    trade_executor: 9002
-    order_processor: 9003
-    matching: 9004
-    code: 9005
-    p2p: 9006
-    conversation: 9007
-    notify: 9008
-    activity_recorder: 9009
-    quantex_runner: 9010

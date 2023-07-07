@@ -7,16 +7,20 @@
   become: false
   run_once: true
   with_items:
-    - z-dax
     - peatio
+    - barong
+    - z-dax
 
-- name: compress all the files in tar.gz
+- name: compress subcharts files into tar.gz
   community.general.archive:
-    path: "{{ workspace_charts_dir }}/peatio"
-    dest: "{{ workspace_charts_dir }}/z-dax/charts/peatio.tgz"
+    path: "{{ workspace_charts_dir }}/{{ item }}"
+    dest: "{{ workspace_charts_dir }}/z-dax/charts/{{ item }}.tgz"
     format: gz
   become: false
   run_once: true
+  with_items:
+    - peatio
+    - barong
 
 - name: Deploy local z-dax chart
   kubernetes.core.helm:
@@ -24,15 +28,34 @@
     chart_ref: "{{ workspace_charts_dir }}/z-dax"
     release_namespace: "{{ namespace }}"
     values:
-      global:
-        svcPorts:
-          deposit_address: "{{ service_ports.deposit_address }}"
-          withdraw: "{{ service_ports.withdraw }}"
-          trade_executor: "{{ service_ports.trade_executor }}"
-          order_processor: "{{ service_ports.order_processor }}"
-          matching: "{{ service_ports.matching }}"
-          code: "{{ service_ports.code }}"
-          p2p: "{{ service_ports.p2p }}"
-          conversation: "{{ service_ports.conversation }}"
-          notify: "{{ service_ports.notify }}"
-          quantex_runner: "{{ service_ports.quantex_runner }}"
+      peatio:
+        serviceAccount:
+          name: z-dax
+        service:
+          ports:
+            deposit_address: "{{ service_ports.deposit_address }}"
+            withdraw: "{{ service_ports.withdraw }}"
+            trade_executor: "{{ service_ports.trade_executor }}"
+            order_processor: "{{ service_ports.order_processor }}"
+            matching: "{{ service_ports.matching }}"
+            p2p: "{{ service_ports.p2p }}"
+            conversation: "{{ service_ports.conversation }}"
+            notify: "{{ service_ports.notify }}"
+            grpc: "{{ service_ports.peatio_grpc }}"
+      barong:
+        authz:
+          jwt_secret:
+            name: "{{ jwt_secret.name }}"
+            file: "{{ jwt_secret.file }}"
+        serviceAccount:
+          name: z-dax
+        service:
+          ports:
+            code: "{{ service_ports.code }}"
+            activity_recorder: "{{ service_ports.activity_recorder }}"
+      quantex:
+        serviceAccount:
+          name: z-dax
+        service:
+          ports:
+            runner: "{{ service_ports.quantex_runner }}"

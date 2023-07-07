@@ -28,7 +28,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-            - kaigara ./peatio migration && kaigara ./peatio seed && echo "seeding done"
+            - kaigara ./peatio migration && kaigara ./peatio seed
           env:
             - name: VAULT_TOKEN
               valueFrom:

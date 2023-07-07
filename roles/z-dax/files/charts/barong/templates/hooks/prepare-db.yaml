@@ -22,13 +22,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       restartPolicy: OnFailure
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         - name: prepare-db
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-            - kaigara ./barong migration && kaigara ./barong seed && echo "seeding done"
+            - kaigara ./barong migration && kaigara ./barong seed
           env:
             - name: VAULT_TOKEN
               valueFrom:
@@ -38,17 +39,10 @@ spec:
             {{ include "prepare.env" . | nindent 12 }}
           volumeMounts:
             - name: config
-              mountPath: /app/config/seed/markets.yml
-              subPath: markets.yml
-            - name: config
-              mountPath: /app/config/seed/currencies.yml
-              subPath: currencies.yml
-            - name: config
-              mountPath: /app/config/seed/accounts.yml
-              subPath: accounts.yml
+              mountPath: /app/config/seeds.yml
+              subPath: seeds.yml
       volumes:
         - name: config
           configMap:
             name: {{ template "barong.fullname" . }}
-      serviceAccountName: z-dax
 {{- end }}

@@ -44,6 +44,10 @@ service_names: # Only for backend services like database
   kouda: kouda # Do not change this
   quantex: quantex # Do not change this
 
+jwt_secret:
+  name: "jwt-private-key"
+  file: jwt.key
+
 service_ports: # Only for application services
   deposit_address: 9000
   withdraw: 9001
@@ -56,6 +60,7 @@ service_ports: # Only for application services
   notify: 9008
   activity_recorder: 9009
   quantex_runner: 9010
+  peatio_grpc: 9011
 
 object_storage:
   bucket: zsmartex

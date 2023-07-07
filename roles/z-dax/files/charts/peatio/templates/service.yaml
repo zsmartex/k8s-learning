@@ -7,9 +7,13 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.service.ports.api }}
       targetPort: api
       protocol: TCP
-      name: {{ .Values.service.name }}
+      name: {{ .Values.service.name }}-api
+    - port: {{ .Values.service.ports.grpc }}
+      targetPort: grpc
+      protocol: TCP
+      name: {{ .Values.service.name }}-grpc
   selector:
     {{- include "peatio.selectorLabels" . | nindent 4 }}

@@ -13,12 +13,23 @@ image:
   tag: "latest"
   PullSecrets: []
 
+serviceAccount:
+  name: barong
+
 podSecurityContext:
   {}
   # fsGroup: 2000
 
 kaigara:
   appName: barong
+  daemonsAppName: barong,barong_daemons
+  seedAppName: barong,barong_seed
+  scopes: private,secret
+
+authz:
+  jwt_secret:
+    name: jwt
+    file: jwt.key
 
 securityContext:
   {}
@@ -31,8 +42,12 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 3000
   name: barong
+  ports:
+    api: 3000
+    authz: 3000
+    code: 9001
+    activity_recorder: 9002
 
 resources:
   {}
@@ -60,10 +75,6 @@ global:
 
   deploymentId: z-dax
   kaigaraSecretStore: vault
-
-  svcPorts:
-    code: 9001
-    activity_recorder: 9002
 
 autoscaling:
   enabled: false

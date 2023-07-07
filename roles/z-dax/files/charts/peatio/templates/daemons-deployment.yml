@@ -2,6 +2,7 @@
 {{- $releaseName := .Release.Name }}
 {{- $env := include "daemons.env" . }}
 {{- $image := printf "%s:%s" .Values.image.repository .Values.image.tag }}
+{{- $serviceAccountName := include "barong.serviceAccountName" . }}
 {{- $values := .Values }}
 
 {{- range $daemon := .Values.daemons }}
@@ -42,6 +43,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      serviceAccountName: {{ $serviceAccountName }}
       containers:
         - name: "{{ $daemon | replace "_" "-" }}-daemon"
           image: {{ $image }}
@@ -53,5 +55,4 @@ spec:
             {{- toYaml $values.resources | nindent 12 }}
           env:
             {{ $env | nindent 12 }}
-      serviceAccountName: z-dax
 {{- end }}

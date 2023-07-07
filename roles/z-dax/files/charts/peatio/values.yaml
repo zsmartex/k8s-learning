@@ -13,12 +13,18 @@ image:
   tag: "latest"
   PullSecrets: []
 
+serviceAccount:
+  name: peatio
+
 podSecurityContext:
   {}
   # fsGroup: 2000
 
 kaigara:
   appName: peatio
+  daemonsAppName: peatio,peatio_daemons
+  seedAppName: peatio,peatio_seed
+  scopes: private,secret
 
 securityContext:
   {}
@@ -31,8 +37,18 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 3000
   name: peatio
+  ports:
+    api: 3000
+    deposit_address: 9000
+    withdraw: 9001
+    trade_executor: 9002
+    order_processor: 9003
+    matching: 9004
+    p2p: 9006
+    conversation: 9007
+    notify: 9008
+    grpc: 9009
 
 resources:
   {}
@@ -67,16 +83,6 @@ global:
 
   deploymentId: z-dax
   kaigaraSecretStore: vault
-
-  svcPorts:
-    deposit_address: 9000
-    withdraw: 9001
-    trade_executor: 9002
-    order_processor: 9003
-    matching: 9004
-    p2p: 9006
-    conversation: 9007
-    notify: 9008
 
 autoscaling:
   enabled: false

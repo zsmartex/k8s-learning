@@ -33,26 +33,56 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-api
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c"]
           args:
-            - source /vault/secrets/config && kaigara ./peatio api -p 3000
+            - source /vault/secrets/config && kaigara ./peatio api -p {{ .Values.service.ports.api }}
           ports:
             - name: api
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.ports.api }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /api/public/timestamp
-              port: http
+              port: api
           readinessProbe:
             httpGet:
               path: /api/public/timestamp
-              port: http
+              port: api
+          env:
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.secretPrefix }}-global
+                  key: peatioVaultToken
+            {{ include "server.env" . | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config/abilities.yml
+              subPath: abilities.yml
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        - name: {{ .Chart.Name }}-grpc
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - source /vault/secrets/config && kaigara ./peatio grpc -p {{ .Values.service.ports.grpc }}
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.service.ports.grpc }}
+              protocol: TCP
+          livenessProbe:
+            grpc:
+              port: {{ .Values.service.ports.grpc }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
           env:
             - name: VAULT_TOKEN
               valueFrom:
@@ -82,4 +112,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: z-dax

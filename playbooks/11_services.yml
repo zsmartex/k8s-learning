@@ -11,5 +11,5 @@
     - elasticsearch
     - vault
     - redis
-    - secrets
     - kafka
+    - secrets

@@ -10,4 +10,6 @@ __code_grpc_addr: "{{ service_names.peatio }}-stream-daemon:{{ service_ports.cod
 __p2p_grpc_addr: "{{ service_names.peatio }}-stream-daemon:{{ service_ports.p2p }}"
 __conversation_grpc_addr: "{{ service_names.peatio }}-stream-daemon:{{ service_ports.conversation }}"
 __notify_grpc_addr: "{{ service_names.peatio }}-stream-daemon:{{ service_ports.notify }}"
-__activity_recorder_grpc_addr: "{{ service_names.peatio }}-stream-daemon:{{ service_ports.activity_recorder }}"
+__activity_recorder_grpc_addr: "{{ service_names.barong }}-stream-daemon:{{ service_ports.activity_recorder }}"
+__runner_grpc_addr: "{{ service_names.quantex }}-stream-daemon:{{ service_ports.quantex_runner }}"
+_peatio_grpc_addr: "{{ service_names.peatio }}:{{ service_ports.peatio_grpc }}"

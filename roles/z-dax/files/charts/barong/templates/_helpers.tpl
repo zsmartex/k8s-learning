@@ -45,11 +45,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "barong.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "barong.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
 {{- default "default" .Values.serviceAccount.name }}
-{{- end }}
 {{- end }}
 
 {{/*
@@ -79,7 +75,7 @@ Environment for barong rails container
 */}}
 {{- define "server.env" -}}
 - name: KAIGARA_APP_NAME
-  value: {{ default "barong" .Values.kaigara.barongAppName }}
+  value: {{ default "barong" .Values.kaigara.appName }}
 {{ include "env" . }}
 {{- end -}}
 
@@ -97,6 +93,6 @@ Environment for barong prepare db container
 */}}
 {{- define "prepare.env" -}}
 - name: KAIGARA_APP_NAME
-  value: {{ default "barong,barong_seed" .Values.kaigara.daemonsAppName }}
+  value: {{ default "barong,barong_seed" .Values.kaigara.seedAppName }}
 {{ include "env" . }}
 {{- end -}}

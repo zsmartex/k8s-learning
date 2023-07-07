@@ -2,10 +2,11 @@
 {{- $releaseName := .Release.Name }}
 {{- $env := include "daemons.env" . }}
 {{- $image := printf "%s:%s" .Values.image.repository .Values.image.tag }}
+{{- $serviceAccountName := include "barong.serviceAccountName" . }}
 {{- $values := .Values }}
 
 {{- range $streamDaemon := $values.streamDaemons }}
-{{- $port := (index $values.global.svcPorts $streamDaemon) }}
+{{- $port := (index $values.service.ports $streamDaemon) }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,6 +44,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      serviceAccountName: {{ $serviceAccountName }}
       containers:
         - name: "{{ $streamDaemon | replace "_" "-" }}-stream-daemon"
           image: {{ $image }}
@@ -51,7 +53,7 @@ spec:
           args:
             - source /vault/secrets/config && kaigara ./{{ $streamDaemon }} -p {{ $port }}
           ports:
-            - name: {{ $streamDaemon | replace "_" "-" }}
+            - name: {{ $streamDaemon | replace "_" "-" | trunc 15 }}
               containerPort: {{ $port }}
           livenessProbe:
             grpc:
@@ -62,5 +64,4 @@ spec:
             {{- toYaml $values.resources | nindent 12 }}
           env:
             {{ $env | nindent 12 }}
-      serviceAccountName: z-dax
 {{- end }}
