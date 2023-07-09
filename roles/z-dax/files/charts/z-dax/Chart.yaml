@@ -9,3 +9,5 @@ dependencies:
     version: 0.1.0
   - name: barong
     version: 0.1.0
+  - name: kouda
+    version: 0.1.0

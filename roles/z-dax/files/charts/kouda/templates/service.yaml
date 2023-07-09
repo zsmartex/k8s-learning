@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kouda.fullname" . }}
+  labels:
+    {{- include "kouda.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: {{ .Values.service.name }}-api
+  selector:
+    {{- include "kouda.selectorLabels" . | nindent 4 }}

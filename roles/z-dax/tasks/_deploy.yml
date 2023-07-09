@@ -9,6 +9,7 @@
   with_items:
     - peatio
     - barong
+    - kouda
     - z-dax
 
 - name: compress subcharts files into tar.gz
@@ -21,6 +22,7 @@
   with_items:
     - peatio
     - barong
+    - kouda
 
 - name: Deploy local z-dax chart
   kubernetes.core.helm:
@@ -53,6 +55,9 @@
           ports:
             code: "{{ service_ports.code }}"
             activity_recorder: "{{ service_ports.activity_recorder }}"
+      kouda:
+        serviceAccount:
+          name: z-dax
       quantex:
         serviceAccount:
           name: z-dax

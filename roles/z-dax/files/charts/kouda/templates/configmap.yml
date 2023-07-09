@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "kouda.fullname" . }}
+  labels:
+    {{- include "kouda.labels" . | nindent 4 }}
+data:
+  abilities.yml: |-
+    roles:
+      - superadmin
+      - admin
+      - technical
+      - accountant
+      - compliance
+      - support
+      - reporter
+
+    admin_permissions:
+      superadmin:
+        manage:
+          - Banner
+          - Icon
+      admin:
+        read:
+          - Banner
+          - Icon
+        manage:
+          - Banner
+          - Icon
+      technical:
+        read:
+          - Banner
+        manage:
+          - Banner
+          - Icon
+      accountant:
+        read:
+          - Banner
+          - Icon
+      compliance:
+        read:
+          - Banner
+          - Icon
+        manage:
+          - Banner
+          - Icon
+      support:
+        read:
+          - Banner
+          - Icon
+        manage:
+          - Banner
+          - Icon
+      reporter:
+        read:
+          - Banner
+          - Icon

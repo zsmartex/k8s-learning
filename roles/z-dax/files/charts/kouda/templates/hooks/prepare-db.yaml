@@ -1,0 +1,35 @@
+{{- if .Values.enableMigration }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kouda.name" . }}-prepare-db
+  labels:
+    {{- include "kouda.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "0"
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app: {{ include "kouda.fullname" . }}
+        component: kouda
+    spec:
+      {{- with .Values.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      restartPolicy: OnFailure
+      containers:
+        - name: prepare-db
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - kaigara ./kouda migration
+          env:
+            {{ include "prepare.env" . | nindent 12 }}
+{{- end }}
