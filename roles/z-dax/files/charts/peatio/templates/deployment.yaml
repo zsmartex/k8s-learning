@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "peatio.fullname" . }}
+  name: {{ include "peatio.fullname" . }}-api
   labels:
     {{- include "peatio.labels" . | nindent 4 }}
 spec:

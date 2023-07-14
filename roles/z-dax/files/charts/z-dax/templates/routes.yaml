@@ -1,0 +1,25 @@
+{{- $values := .Values }}
+{{- $namespace := .Release.Namespace }}
+{{- range $service := $values.gatewayServices }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ $service.name }}-route
+spec:
+  hosts:
+  - {{ $values.global.domain }}
+  gateways:
+  - api-gateway
+  http:
+  - match:
+    - uri:
+        prefix: {{ $service.match.uri.prefix }}
+    rewrite:
+      uri: {{ $service.rewrite.uri }}
+    route:
+    - destination:
+        host: {{ $service.name }}
+        port:
+          number: {{ $service.port }}
+{{- end }}

@@ -30,11 +30,36 @@
     chart_ref: "{{ workspace_charts_dir }}/z-dax"
     release_namespace: "{{ namespace }}"
     values:
+      global:
+        domain: "{{ external_domain }}"
+      gatewayServices:
+        - name: barong-api
+          port: "{{ service_ports.barong_api }}"
+          match:
+            uri:
+              prefix: /api/v2/auth
+          rewrite:
+            uri: /api
+        - name: peatio-api
+          port: "{{ service_ports.peatio_api }}"
+          match:
+            uri:
+              prefix: /api/v2/trade
+          rewrite:
+            uri: /api
+        - name: kouda-api
+          port: "{{ service_ports.kouda_api }}"
+          match:
+            uri:
+              prefix: /api/v2/kouda
+          rewrite:
+            uri: /api
       peatio:
         serviceAccount:
           name: z-dax
         service:
           ports:
+            api: "{{ service_ports.peatio_api }}"
             deposit_address: "{{ service_ports.deposit_address }}"
             withdraw: "{{ service_ports.withdraw }}"
             trade_executor: "{{ service_ports.trade_executor }}"
@@ -53,14 +78,19 @@
           name: z-dax
         service:
           ports:
+            api: "{{ service_ports.barong_api }}"
+            authz: "{{ service_ports.barong_authz }}"
             code: "{{ service_ports.code }}"
             activity_recorder: "{{ service_ports.activity_recorder }}"
       kouda:
         serviceAccount:
           name: z-dax
+        service:
+          port: "{{ service_ports.kouda_api }}"
       quantex:
         serviceAccount:
           name: z-dax
         service:
           ports:
+            port: "{{ service_ports.quantex_api }}"
             runner: "{{ service_ports.quantex_runner }}"

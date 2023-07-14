@@ -6,11 +6,6 @@
     kind: Namespace
     state: present
 
-- name: Add istio chart repo
-  kubernetes.core.helm_repository:
-    name: istio
-    repo_url: https://istio-release.storage.googleapis.com/charts
-
 - name: Patch istio-system namespace with istio-injection
   kubernetes.core.k8s:
     state: patched
@@ -21,6 +16,11 @@
         name: istio-system
         labels:
           "istio-injection": enabled
+
+- name: Add istio chart repo
+  kubernetes.core.helm_repository:
+    name: istio
+    repo_url: https://istio-release.storage.googleapis.com/charts
 
 - name: Deploy latest version of istio/base chart
   kubernetes.core.helm:

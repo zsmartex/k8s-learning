@@ -5,3 +5,6 @@ global:
 
   deploymentId: z-dax
   kaigaraSecretStore: vault
+  domain: www.zsmartex.com
+
+gatewayServices: []

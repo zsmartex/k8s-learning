@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kouda.fullname" . }}
+  name: {{ include "kouda.fullname" . }}-api
   labels:
     {{- include "kouda.labels" . | nindent 4 }}
 spec:
@@ -47,11 +47,11 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /api/v2/public/timestamp
+              path: /api/public/timestamp
               port: api
           readinessProbe:
             httpGet:
-              path: /api/v2/public/timestamp
+              path: /api/public/timestamp
               port: api
           env:
             {{ include "server.env" . | nindent 12 }}

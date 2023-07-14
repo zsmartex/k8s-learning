@@ -25,7 +25,7 @@ storage_class: k8slvm
 docker_registry_secret: docker-registry
 
 internal_domain: k8s-learn.com
-external_domain: zsmartex.com
+external_domain: www.zsmartex.com
 
 service_names: # Only for backend services like database
   postgresql: postgresql
@@ -61,6 +61,12 @@ service_ports: # Only for application services
   activity_recorder: 9009
   quantex_runner: 9010
   peatio_grpc: 9011
+  # Api service ports (should not change)
+  barong_api: 3000
+  barong_authz: 3000
+  peatio_api: 3000
+  kouda_api: 3000
+  quantex_api: 3000
 
 object_storage:
   bucket: zsmartex
